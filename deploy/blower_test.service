@@ -1,0 +1,12 @@
+[Unit]
+Description=Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+User=gastro
+ExecStart=bash /home/blower/rpi_blower_tester/deploy/run.sh 
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Blower Tester"
+version = "2025.05.27"
+dependencies = [
+]
+requires-python = ">=3.0"
+authors = [
+  {name = "Dann Demetre", email = "dann.demetre@gastronomous.ca"},
+]
+maintainers = [
+  {name = "Shaqeeb Momen", email = "shaqeeb.momen@gastronomous.ca"}
+]
+description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
+readme = "README.md"
+
+[project.urls]
+Documentation = "Update this later"
+Repository = "https://github.com/ddem-gast/rpi_blower_tester.git"
+"Bug Tracker" = "https://github.com/ddem-gast/rpi_blower_tester/issues"
+Changelog = "https://github.com/ddem-gast/rpi_blower_tester/main/CHANGELOG.md"
+
+[project.scripts]
+spam-cli = "spam:main_cli"
+
+[project.gui-scripts]
+spam-gui = "spam:main_gui"
+
+[project.entry-points."spam.magical"]
+tomatoes = "spam:main_tomatoes"
