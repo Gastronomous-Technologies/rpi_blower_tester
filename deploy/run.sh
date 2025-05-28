@@ -1,3 +1,2 @@
-#!/bin/bash
-
-openvt -sw python -m blower_tester
+#!/bin/bash 
+docker run -it -v /dev:/dev --device /dev:/dev --net=host -it blower_app

@@ -20,14 +20,5 @@ readme = "README.md"
 [project.urls]
 Documentation = "Update this later"
 Repository = "https://github.com/ddem-gast/rpi_blower_tester.git"
-"Bug Tracker" = "https://github.com/ddem-gast/rpi_blower_tester/issues"
+Bug Tracker = "https://github.com/ddem-gast/rpi_blower_tester/issues"
 Changelog = "https://github.com/ddem-gast/rpi_blower_tester/main/CHANGELOG.md"
-
-[project.scripts]
-spam-cli = "spam:main_cli"
-
-[project.gui-scripts]
-spam-gui = "spam:main_gui"
-
-[project.entry-points."spam.magical"]
-tomatoes = "spam:main_tomatoes"
