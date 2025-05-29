@@ -3,9 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "Blower Tester"
+name = "blower_tester"
 version = "2025.05.27"
 dependencies = [
+  "pytest"
 ]
 requires-python = ">=3.0"
 authors = [
@@ -18,7 +19,4 @@ description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
 readme = "README.md"
 
 [project.urls]
-Documentation = "Update this later"
-Repository = "https://github.com/ddem-gast/rpi_blower_tester.git"
-Bug Tracker = "https://github.com/ddem-gast/rpi_blower_tester/issues"
-Changelog = "https://github.com/ddem-gast/rpi_blower_tester/main/CHANGELOG.md"
+Repository = "https://github.com/Gastronomous-Technologies/rpi_blower_tester.git"

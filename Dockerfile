@@ -4,8 +4,9 @@ WORKDIR /usr/local/app
 #STM32 Programmer prerequisites
 #https://freeelectron.ro/installing-st-link-v2-to-flash-stm32-targets-on-linux/
 RUN apt-get update && \
-    apt-get install git make cmake libusb-1.0.0-dev gcc build-essential -y
-
+    apt-get install git make cmake libusb-1.0.0-dev gcc \
+    usbutils build-essential -y
+   
 RUN mkdir stm32 && cd stm32 && \
     git clone https://github.com/stlink-org/stlink && \
     cd stlink && \
@@ -14,5 +15,6 @@ RUN mkdir stm32 && cd stm32 && \
 
 # Copy in the source code
 COPY blower_tester ./blower_tester
+RUN pip install --upgrade pip && cd blower_tester && pip install .
 
 CMD ["sleep", "1000"]

@@ -15,10 +15,6 @@ sudo apt-get install -y uidmap
 sudo systemctl enable docker
 sudo systemctl start docker
 
-echo "export PATH=/usr/bin:$PATH" >> ~/.bashrc
-echo "export DOCKER_HOST=unix:///run/user/1000/docker.sock" >> ~/.bashrc
-source ~/.bashrc
-
 #Systemd Service Installation
 echo "Installing systemd blower service"
 
@@ -33,4 +29,5 @@ sudo systemctl daemon-reload
 sudo systemctl enable $SERVICE_FILE
 
 #STLINK Udev
-sudo cp $SCRIPT_DIR/config/49-stlinkv* /etc/udev/rules.d/
+echo "Setting UDEV rules for STLINK V2"
+sudo cp $SCRIPT_DIR/../config/49-stlinkv* /etc/udev/rules.d/
