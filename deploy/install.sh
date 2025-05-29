@@ -15,10 +15,6 @@ sudo apt-get install -y uidmap
 sudo systemctl enable docker
 sudo systemctl start docker
 
-echo "export PATH=/usr/bin:$PATH" >> ~/.bashrc
-echo "export DOCKER_HOST=unix:///run/user/1000/docker.sock" >> ~/.bashrc
-source ~/.bashrc
-
 #Systemd Service Installation
 echo "Installing systemd blower service"
 
