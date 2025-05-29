@@ -6,5 +6,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Build Docker Image 
+      run: ./deploy/build.sh
+    - name: Test
+      run: ./deploy/test.sh

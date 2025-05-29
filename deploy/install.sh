@@ -31,3 +31,8 @@ sudo systemctl enable $SERVICE_FILE
 #STLINK Udev
 echo "Setting UDEV rules for STLINK V2"
 sudo cp $SCRIPT_DIR/../config/49-stlinkv* /etc/udev/rules.d/
+
+#User prompt to enable SPI and I2C
+echo "Installation complete, please enable I2C and SPI through raspi-config and reboot"
+echo "'sudo raspi-config' -> Interface Options ..."
+

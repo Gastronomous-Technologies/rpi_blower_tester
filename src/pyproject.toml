@@ -16,7 +16,6 @@ maintainers = [
   {name = "Shaqeeb Momen", email = "shaqeeb.momen@gastronomous.ca"}
 ]
 description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
-readme = "README.md"
 
 [project.urls]
 Repository = "https://github.com/Gastronomous-Technologies/rpi_blower_tester.git"
