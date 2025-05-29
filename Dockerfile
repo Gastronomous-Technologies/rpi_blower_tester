@@ -14,10 +14,10 @@ RUN mkdir stm32 && cd stm32 && \
     cd ../lib cp *.so* /lib && cd /usr/local/app
 
 # Copy in the source code
-COPY ./src . 
+COPY ./src src 
 
 ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install --upgrade pip && pip install .
+RUN pip install --upgrade pip && pip install src/.
 
 CMD ["sleep", "1000"]
 #CMD ["python", "-m", "blower_tester"]
