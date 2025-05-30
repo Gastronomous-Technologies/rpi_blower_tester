@@ -15,7 +15,7 @@ A systemd service starts a docker container that launches a python application. 
 ./rpi_blower_tester install
 ```
 
-##Uninstall
+## Uninstall
 ```sh
 ./uninstall
 ```
