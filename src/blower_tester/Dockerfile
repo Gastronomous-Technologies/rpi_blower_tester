@@ -23,7 +23,6 @@ WORKDIR /home/app
 COPY . .
 
 #Install python application
-RUN export PATH=$PATH:/home/app/.local/bin
 RUN pip install --upgrade pip && pip install .
 
 CMD ["python", "-m", "blower_tester"]
