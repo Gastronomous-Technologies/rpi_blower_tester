@@ -18,7 +18,7 @@ maintainers = [
 description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/"]
+packages = ["blower_tester/"]
 
 [project.urls]
 Repository = "https://github.com/Gastronomous-Technologies/rpi_blower_tester.git"
