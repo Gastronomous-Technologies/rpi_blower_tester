@@ -65,7 +65,7 @@ do
     ;;
 
     test)
-      sudo docker run --rm -it $APP python -m pytest -o cache_dir=$WORKSPACE
+      sudo docker run --rm $APP python -m pytest -o cache_dir=$WORKSPACE
     ;;
 
     *)
