@@ -1,0 +1,100 @@
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+BIN_FILE=$(cd $SCRIPT_DIR && ls)
+SERVICE_FILE=$(cd $SCRIPT_DIR/../src/blower_tester/ && ls *.service)
+APP="rpi_blower_app"
+
+function install_program {
+  #System Updates
+  sudo apt-get update -y
+  sudo apt-get install -y git
+
+  #Docker Installation
+  echo "Installing Docker"
+
+  curl -sSL https://get.docker.com | sh
+  sudo apt-get install -y uidmap
+
+  dockerd-rootless-setuptool.sh install
+  sudo systemctl --user start docker.service
+  echo "export DOCKER_HOST=unix://run/user/1000/docker.sock" >> ~/.bashrc
+  source ~/.bashrc
+  sudo systemctl enable docker
+  sudo loginctl enable-linger $USER
+  sudo systemctl start docker
+
+  #Systemd Service Installation
+  echo "Installing systemd blower service"
+
+  sudo cp $SCRIPT_DIR/$SERVICE_FILE /etc/systemd/system/
+  sudo cp $SCRIPT_DIR/$SERVICE_FILE /usr/lib/systemd/system/
+  sudo chmod 700 /etc/systemd/system/$SERVICE_FILE
+  sudo chmod 600 /usr/lib/systemd/system/$SERVICE_FILE
+  sudo chgrp root /etc/systemd/system/$SERVICE_FILE /usr/lib/systemd/system/$SERVICE_FILE
+  sudo chown root /etc/systemd/system/$SERVICE_FILE /usr/lib/systemd/system/$SERVICE_FILE
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable $SERVICE_FILE
+
+  #STLINK Config
+  echo "Setting UDEV rules for STLINK V2"
+  sudo cp $SCRIPT_DIR/../lib/stlink_rules/* /etc/udev/rules.d/
+  sudo adduser $USER dialout
+  sudo udevadm control --reload-rules && udevadm trigger
+
+  #Copy relevant files into /usr/local directory
+  cp $SCRIPT_DIR/$BIN_FILE /usr/local/bin/
+  cp -r $SCRIPT_DIR/../src/ /usr/local/src/
+
+  #User prompt to enable SPI and I2C
+  echo "Installation complete, please enable I2C and SPI through raspi-config and reboot"
+  echo "'sudo raspi-config' -> Interface Options ..."
+}
+
+function uninstall_program {
+  echo "Uninstalling Program"
+
+  sudo rm /usr/local/bin/$BIN_FILE
+  sudo rm -r /usr/local/src/blower_tester/
+  sudo rm -r /etc/udev/rules.d/stlink_rules
+  sudo udevadm control --reload-rules && udevadm trigger
+
+  sudo rm /etc/systemd/system/$SERVICE_FILE
+  sudo rm /usr/lib/systemd/system/$SERVICE_FILE
+  sudo systemctl daemon-reload
+}
+
+#Main
+for cmd in "$@"
+do
+  case "$cmd" in
+
+    build)
+      docker build -t $APP .
+    ;;
+
+    install)
+      install_program
+    ;;
+
+    run)
+      docker run --rm -it --device=/dev/stlinkv2_3 $APP
+    ;;
+
+    test)
+      docker run $APP pytest /usr/local/src/blower_tester/tests -s
+    ;;
+
+    uninstall)
+      echo uninstall_program
+    ;;
+
+    *)
+      echo -n "Unknown command, skipping ..."
+    ;;
+
+  esac
+
+done

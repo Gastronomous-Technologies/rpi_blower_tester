@@ -5,7 +5,7 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/openvt -s -w /home/blower/rpi_blower_tester/deploy/run.sh 
+ExecStart=/usr/bin/openvt -s -w /usr/local/bin/rpi_blower_tester run
 
 [Install]
 WantedBy=multi-user.target

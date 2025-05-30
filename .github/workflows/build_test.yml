@@ -1,4 +1,4 @@
-name: Build and Test
+name: Install Build and Test
 on: [push]
 
 jobs:
@@ -6,7 +6,9 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
-    - name: Build Docker Image 
-      run: ./deploy/build.sh
+    - name: Install
+      run: ./bin/rpi_blower_tester.sh install
+    - name: Build
+      run: rpi_blower_tester build
     - name: Test
-      run: ./deploy/test.sh
+      run: rpi_blower_tester test

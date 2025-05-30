@@ -13,10 +13,15 @@ RUN mkdir stm32 && cd stm32 && \
     cmake . && make && cd bin && cp st-* /usr/local/bin && \ 
     cd ../lib cp *.so* /lib && cd /usr/local/app
 
-# Copy in the source code
-COPY ./src src 
+#Create a non-root user to run the application
+RUN useradd app && adduser app dialout
 
-ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install --upgrade pip && pip install src/.
+USER app
+WORKDIR /home/app
+
+#Copy in the source code
+COPY . . 
+
+RUN pip install --upgrade pip && pip install .
 
 CMD ["python", "-m", "blower_tester"]
