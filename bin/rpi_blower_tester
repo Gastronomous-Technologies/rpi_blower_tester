@@ -15,21 +15,13 @@ function install_program {
   echo "Installing Docker"
 
   curl -sSL https://get.docker.com | sh
-  sudo apt-get install -y uidmap
-
-  dockerd-rootless-setuptool.sh install
-  sudo systemctl --user start docker.service
-  echo "export DOCKER_HOST=unix://run/user/1000/docker.sock" >> ~/.bashrc
-  source ~/.bashrc
-  sudo systemctl enable docker
-  sudo loginctl enable-linger $USER
   sudo systemctl start docker
 
   #Systemd Service Installation
   echo "Installing systemd blower service"
 
-  sudo cp $SCRIPT_DIR/$SERVICE_FILE /etc/systemd/system/
-  sudo cp $SCRIPT_DIR/$SERVICE_FILE /usr/lib/systemd/system/
+  sudo cp $SCRIPT_DIR/../src/blower_tester/$SERVICE_FILE /etc/systemd/system/
+  sudo cp $SCRIPT_DIR/../src/blower_tester/$SERVICE_FILE /usr/lib/systemd/system/
   sudo chmod 700 /etc/systemd/system/$SERVICE_FILE
   sudo chmod 600 /usr/lib/systemd/system/$SERVICE_FILE
   sudo chgrp root /etc/systemd/system/$SERVICE_FILE /usr/lib/systemd/system/$SERVICE_FILE
@@ -42,28 +34,11 @@ function install_program {
   echo "Setting UDEV rules for STLINK V2"
   sudo cp $SCRIPT_DIR/../lib/stlink_rules/* /etc/udev/rules.d/
   sudo adduser $USER dialout
-  sudo udevadm control --reload-rules && udevadm trigger
 
   #Copy relevant files into /usr/local directory
-  cp $SCRIPT_DIR/$BIN_FILE /usr/local/bin/
-  cp -r $SCRIPT_DIR/../src/ /usr/local/src/
+  sudo cp $SCRIPT_DIR/$BIN_FILE /usr/local/bin/
+  sudo cp -r $SCRIPT_DIR/../src/* /usr/local/src/
 
-  #User prompt to enable SPI and I2C
-  echo "Installation complete, please enable I2C and SPI through raspi-config and reboot"
-  echo "'sudo raspi-config' -> Interface Options ..."
-}
-
-function uninstall_program {
-  echo "Uninstalling Program"
-
-  sudo rm /usr/local/bin/$BIN_FILE
-  sudo rm -r /usr/local/src/blower_tester/
-  sudo rm -r /etc/udev/rules.d/stlink_rules
-  sudo udevadm control --reload-rules && udevadm trigger
-
-  sudo rm /etc/systemd/system/$SERVICE_FILE
-  sudo rm /usr/lib/systemd/system/$SERVICE_FILE
-  sudo systemctl daemon-reload
 }
 
 #Main
@@ -72,27 +47,31 @@ do
   case "$cmd" in
 
     build)
-      docker build -t $APP .
+      sudo docker build -t $APP /usr/local/src/blower_tester/
     ;;
 
     install)
       install_program
+      sudo docker build -t $APP /usr/local/src/blower_tester/
+
+      #User prompt to enable SPI and I2C
+      printf "\033[0;32m\nInstallation complete, please enable I2C and SPI through raspi-config\n"
+      printf "Please enable I2C and SPI through raspi-config and reboot\n\033[0m"
+      echo "'sudo raspi-config' -> Interface Options ..."
     ;;
 
     run)
-      docker run --rm -it --device=/dev/stlinkv2_3 $APP
+      sudo docker run --rm -it --device=/dev/stlinkv2_3 $APP
     ;;
 
     test)
-      docker run $APP pytest /usr/local/src/blower_tester/tests -s
-    ;;
-
-    uninstall)
-      echo uninstall_program
+      sudo docker run --rm -it $APP python -m pytest -o cache_dir=$WORKSPACE
     ;;
 
     *)
-      echo -n "Unknown command, skipping ..."
+      echo -n "Unknown command, known commands are:"
+      echo -n "build, install, run, test"
+      echo -n "skipping ..."
     ;;
 
   esac

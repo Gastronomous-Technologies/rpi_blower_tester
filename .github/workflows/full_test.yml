@@ -1,4 +1,4 @@
-name: Install Build and Test
+name: Install and Test
 on: [push]
 
 jobs:
