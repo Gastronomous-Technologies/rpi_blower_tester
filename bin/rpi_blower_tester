@@ -14,7 +14,7 @@ function install_program {
   #rootless Docker Installation
   echo "Installing Docker for current user"
 
-#  curl -sSL https://get.docker.com | sh
+  curl -sSL https://get.docker.com | sh
   sudo apt-get install -y uidmap dbus-user-session slirp4netns
 
   unset DOCKER_HOST
