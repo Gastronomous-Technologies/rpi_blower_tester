@@ -7,7 +7,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install
-      run: ./bin/rpi_blower_tester.sh install
+      run: ./bin/rpi_blower_tester install
     - name: Build
       run: rpi_blower_tester build
     - name: Test
