@@ -12,3 +12,5 @@ jobs:
       run: rpi_blower_tester build
     - name: Test
       run: rpi_blower_tester test
+    - name: Uninstall
+      run: ./bin/uninstall
