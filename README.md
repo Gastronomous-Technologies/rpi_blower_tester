@@ -12,3 +12,13 @@ A systemd service starts a docker container that launches a python application. 
 
 ### OS Support
 Raspbian, Linux, macOS
+
+## Install
+```sh
+sudo chmod +x *.sh && ./install.sh
+```
+
+## Uninstall
+```sh
+./uninstall.sh
+```

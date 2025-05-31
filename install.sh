@@ -3,14 +3,14 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
-EXEC_FILE="rpi_blower_test"
+EXEC_FILE="rpi_blower_tester"
 APP="rpi_blower_app"
 
 SERVICE_FILE=$(ls *.service)
 FD_RULES=$(ls *stlinkv2*.rules)
 
 function inst_docker {
-  """rootless Docker Installation"""
+  #rootless Docker Installation
   echo "Installing Docker for current user"
 
   curl -sSL https://get.docker.com | sh
@@ -31,23 +31,23 @@ function inst_docker {
 }
 
 function inst_serv {
-  """Systemd Service Installation"""
+  #Systemd Service Installation
   echo "Installing systemd blower service"
 
   sudo cp $SERVICE_FILE /etc/systemd/system/
   sudo chmod 700 /etc/systemd/system/$SERVICE_FILE
-  sudo chgrp root /usr/lib/systemd/system/$SERVICE_FILE
+  sudo chgrp root /etc/systemd/system/$SERVICE_FILE 
 
   sudo cp $SERVICE_FILE /usr/lib/systemd/system/
   sudo chmod 600 /usr/lib/systemd/system/$SERVICE_FILE
-  sudo chgrp root /etc/systemd/system/$SERVICE_FILE 
+  sudo chgrp root /usr/lib/systemd/system/$SERVICE_FILE
 
   sudo systemctl daemon-reload
   sudo systemctl enable $SERVICE_FILE
 }
 
 function cp_udev_rule {
-  """STLINK Config"""
+  #STLINK Config
   echo "Setting UDEV rules for STLINK V2"
   sudo cp $FD_RULES /etc/udev/rules.d/
   sudo adduser $USER dialout
