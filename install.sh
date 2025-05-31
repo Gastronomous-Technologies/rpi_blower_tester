@@ -11,11 +11,13 @@ FD_RULES=$(ls *stlinkv2*.rules)
 
 function inst_docker {
   #Docker Installation
-  if ! command -v docker; then
+  if command -v docker; then
+    sudo apt-get install -y docker-ce-rootless-extras -y 
+  else
     echo "Installing Docker"
     curl -sSL https://get.docker.com | sh
   fi
-  
+
   #Allowing rootless
   echo "Allowing rootless docker"
   sudo apt-get install -y uidmap dbus-user-session slirp4netns
