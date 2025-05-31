@@ -43,7 +43,6 @@ function inst_serv {
   sudo chgrp root /usr/lib/systemd/system/$SERVICE_FILE
 
   sudo systemctl daemon-reload
-  sudo systemctl enable $SERVICE_FILE
 }
 
 function cp_udev_rule {
@@ -68,7 +67,12 @@ sudo cp $EXEC_FILE /usr/local/bin/
 sudo cp -r blower_tester /usr/local/src/
 docker build -t $APP /usr/local/src/blower_tester/
 
-#User prompt to enable SPI and I2C
-printf "\033[0;32m\nInstallation complete, please enable I2C and SPI through raspi-config\n"
-printf "Please enable I2C and SPI through raspi-config and reboot\n\033[0m"
-echo "'sudo raspi-config' -> Interface Options ..."
+printf "\033[0;32m\nInstallation complete\n\033[0m"
+ 
+if cat /etc/os-release | grep "Raspbian"; then
+  echo "RPI detected, enabling on boot"
+  sudo systemctl enable $SERVICE_FILE
+
+  echo "Please enable I2C and SPI through raspi-config and reboot"
+  echo "'sudo raspi-config' -> Interface Options ..."
+fi
