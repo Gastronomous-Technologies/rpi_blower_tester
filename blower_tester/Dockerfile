@@ -17,7 +17,7 @@ RUN mkdir stm32 && cd stm32 && \
     cd stlink && cmake . && make 
 
 USER ROOT
-    cd bin && cp st-* /usr/local/bin && \ 
+RUN cd bin && cp st-* /usr/local/bin && \ 
     cd ../lib && cp *.so* /lib
 
 USER app
