@@ -15,7 +15,7 @@ Raspbian, Linux, macOS
 
 ## Install
 ```sh
-sudo chmod +x *.sh && ./install.sh
+sudo chmod +x install.sh && ./install.sh
 ```
 
 ## Uninstall

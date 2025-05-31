@@ -63,7 +63,8 @@ inst_docker
 inst_serv
 cp_udev_rule
 
-sudo cp $EXEC_FILE /usr/local/bin/
+sudo chmod +x $EXEC_FILE
+sudo cp $EXEC_FILE /usr/local/bin/ 
 sudo cp -r blower_tester /usr/local/src/
 docker build -t $APP /usr/local/src/blower_tester/
 
