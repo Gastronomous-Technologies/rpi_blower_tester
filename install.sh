@@ -53,7 +53,7 @@ function cp_udev_rule {
   sudo adduser $USER dialout
 }
 
-echo "Begging installation of "$APP" -- Version: ""$(cat .version)"
+echo "Beginning installation of "$APP" -- Version: ""$(cat .version)"
 
 sudo apt-get update -y
 sudo apt-get install -y git
