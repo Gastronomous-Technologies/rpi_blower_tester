@@ -16,7 +16,7 @@ RUN mkdir stm32 && cd stm32 && \
     git clone https://github.com/stlink-org/stlink && \
     cd stlink && cmake . && make 
 
-USER ROOT
+USER root
 RUN cd bin && cp st-* /usr/local/bin && \ 
     cd ../lib && cp *.so* /lib
 
