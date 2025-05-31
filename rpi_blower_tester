@@ -11,7 +11,7 @@ do
     ;;
 
     run)
-      docker run --rm -it --device=$(ls */dev/stlinkv2*) $APP
+      docker run --rm -it --device=$(ls /dev/stlinkv2*) $APP
     ;;
 
     test)
