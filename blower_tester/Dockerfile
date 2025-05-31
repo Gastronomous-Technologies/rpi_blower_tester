@@ -23,6 +23,7 @@ RUN cd bin && cp st-* /usr/local/bin && \
     cd ../lib && cp *.so* /lib
 
 USER app
+WORKDIR /home/app
 
 #Copy in the source code
 COPY . .
