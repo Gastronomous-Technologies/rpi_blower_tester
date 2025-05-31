@@ -4,17 +4,22 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blower_tester"
-version = "2025.05.27"
+version = "06.2025"
+
 dependencies = [
   "pytest"
 ]
+
 requires-python = ">=3.0"
+
 authors = [
   {name = "Dann Demetre", email = "dann.demetre@gastronomous.ca"},
 ]
+
 maintainers = [
   {name = "Shaqeeb Momen", email = "shaqeeb.momen@gastronomous.ca"}
 ]
+
 description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
 
 [tool.hatch.build.targets.wheel]
