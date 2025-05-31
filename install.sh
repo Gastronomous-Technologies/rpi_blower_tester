@@ -10,10 +10,14 @@ SERVICE_FILE=$(ls *.service)
 FD_RULES=$(ls *stlinkv2*.rules)
 
 function inst_docker {
-  #rootless Docker Installation
-  echo "Installing Docker for current user"
-
-  curl -sSL https://get.docker.com | sh
+  #Docker Installation
+  if ! command -v docker; then
+    echo "Installing Docker"
+    curl -sSL https://get.docker.com | sh
+  fi
+  
+  #Allowing rootless
+  echo "Allowing rootless docker"
   sudo apt-get install -y uidmap dbus-user-session slirp4netns
 
   unset DOCKER_HOST
