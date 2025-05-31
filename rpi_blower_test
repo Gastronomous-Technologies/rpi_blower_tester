@@ -1,0 +1,29 @@
+APP="rpi_blower_app"
+
+for cmd in "$@"
+
+do
+
+  case "$cmd" in
+
+    build)
+      docker build -t $APP /usr/local/src/blower_tester/
+    ;;
+
+    run)
+      docker run --rm -it --device=$(ls */dev/stlinkv2*) $APP
+    ;;
+
+    test)
+      docker run --rm $APP python -m pytest -o cache_dir=$WORKSPACE
+    ;;
+
+    *)
+      echo -n "Unknown command, known commands are:"
+      echo -n "build, run, test"
+      echo -n "skipping ..."
+    ;;
+
+  esac
+
+done

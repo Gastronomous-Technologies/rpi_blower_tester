@@ -2,15 +2,22 @@ name: Install and Test
 on: [push]
 
 jobs:
+
   build:
+
     runs-on: ubuntu-24.04-arm
+
     steps:
     - uses: actions/checkout@v4
+
     - name: Install
-      run: ./bin/rpi_blower_tester install
+      run: ./install.sh
+
     - name: Build
       run: rpi_blower_tester build
+
     - name: Test
       run: rpi_blower_tester test
+
     - name: Uninstall
-      run: ./bin/uninstall
+      run: ./uninstall.sh
