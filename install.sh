@@ -57,6 +57,7 @@ echo "Begging installation of "$APP" -- Version: ""$(cat .version)"
 
 sudo apt-get update -y
 sudo apt-get install -y git
+sudo chmod +x *.sh
 
 inst_docker
 inst_serv

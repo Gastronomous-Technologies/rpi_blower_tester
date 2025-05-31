@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install
-      run: ./install.sh
+      run: sudo chmod +x *.sh && ./install.sh
 
     - name: Build
       run: rpi_blower_tester build
