@@ -17,6 +17,8 @@ RUN mkdir stm32 && cd stm32 && \
     cd stlink && cmake . && make 
 
 USER root
+WORKDIR /home/app/stm32/stlink
+
 RUN cd bin && cp st-* /usr/local/bin && \ 
     cd ../lib && cp *.so* /lib
 
