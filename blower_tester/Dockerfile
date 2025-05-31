@@ -12,7 +12,7 @@ RUN mkdir stm32 && cd stm32 && \
     git clone https://github.com/stlink-org/stlink && \
     cd stlink && \
     cmake . && make && cd bin && cp st-* /usr/local/bin && \ 
-    cd ../lib cp *.so* /lib && cd /usr/local/app
+    cd ../lib && cp *.so* /lib
  
 #Create a non-root user to run the application
 RUN useradd app && adduser app dialout
