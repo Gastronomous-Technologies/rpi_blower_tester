@@ -1,6 +1,6 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-source $SCRIPT_DIR/src/*.env
+source $SCRIPT_DIR/../src/*.env
 
 for cmd in "$@"
 
@@ -9,7 +9,7 @@ do
   case "$cmd" in
 
     build)
-      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/src/$BLOWER_PY_APP/
+      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/../src/$BLOWER_PY_APP/
     ;;
 
     run)
