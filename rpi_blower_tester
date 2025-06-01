@@ -1,4 +1,6 @@
-APP="rpi_blower_app"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+source $SCRIPT_DIR/src/*.env
 
 for cmd in "$@"
 
@@ -7,15 +9,15 @@ do
   case "$cmd" in
 
     build)
-      docker build -t $APP /usr/local/src/blower_tester/
+      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/src/$BLOWER_PY_APP/
     ;;
 
     run)
-      docker run --rm -it --device=$(ls /dev/stlinkv2*) $APP
+      docker run --rm -it --device=$(ls /dev/stlinkv2*) $BLOWER_APP_NAME
     ;;
 
     test)
-      docker run --rm $APP python -m pytest -o cache_dir=$WORKSPACE
+      docker run --rm $BLOWER_APP_NAME python -m pytest -o cache_dir=$WORKSPACE
     ;;
 
     *)

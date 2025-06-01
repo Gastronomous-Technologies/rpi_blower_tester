@@ -1,10 +1,6 @@
 #!/bin/bash
-
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
-
-EXEC_FILE="rpi_blower_tester"
-APP="rpi_blower_app"
 
 SERVICE_FILE=$(ls *.service)
 FD_RULES=$(ls *stlinkv2*.rules)
@@ -14,8 +10,6 @@ function inst_docker {
   if command -v docker; then
 
     # Allowing packages to be found to ensure rootless installation
-    sudo apt-get update
-    sudo apt-get install ca-certificates curl
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -74,27 +68,36 @@ function cp_udev_rule {
   sudo adduser $USER dialout
 }
 
-echo "Beginning installation of "$APP" -- Version: ""$(cat .version)"
+function install_main {
+  source .env
 
-sudo apt-get update -y
-sudo apt-get install -y git
-sudo chmod +x *.sh
+  echo "Beginning installation of "$BLOWER_APP_NAME" -- Version: "$BLOWER_APP_VERSION")"
 
-inst_docker
-inst_serv
-cp_udev_rule
+  sudo apt-get update 
+  sudo apt-get install -y git ca-certificates curl
+  sudo chmod +x *.sh
 
-sudo chmod +x $EXEC_FILE
-sudo cp $EXEC_FILE /usr/local/bin/ 
-sudo cp -r blower_tester /usr/local/src/
-docker build -t $APP /usr/local/src/blower_tester/
+  inst_docker
+  inst_serv
+  cp_udev_rule
 
-printf "\033[0;32m\nInstallation complete\n\033[0m"
- 
-if cat /etc/os-release | grep "Raspbian"; then
-  echo "RPI detected, enabling on boot"
-  sudo systemctl enable $SERVICE_FILE
+  sudo chmod +x $BLOWER_EXEC_FILE
+  sudo cp $BLOWER_EXEC_FILE $BLOWER_INSTALL_DIR/bin/ 
+  sudo cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
+  sudo cp .env $BLOWER_INSTALL_DIR/src/$BLOWER_PY_APP.env
 
-  echo "Please enable I2C and SPI through raspi-config and reboot"
-  echo "'sudo raspi-config' -> Interface Options ..."
-fi
+  docker build -t $BLOWER_APP_NAME $BLOWER_INSTALL_DIR/src/$BLOWER_PY_APP/
+
+  printf "\033[0;32m\nInstallation complete\n\033[0m"
+  
+  if cat /etc/os-release | grep "Raspbian"; then
+    echo "RPI detected, enabling on boot"
+    sudo systemctl enable $SERVICE_FILE
+
+    echo "Please enable I2C and SPI through raspi-config and reboot"
+    echo "'sudo raspi-config' -> Interface Options ..."
+  fi
+
+}
+
+install_main()
