@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blower_tester"
-dynamic = ["version"]
+version = "06.2025"
 
 dependencies = [
   "pytest"
@@ -21,9 +21,6 @@ maintainers = [
 ]
 
 description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
-
-[tool.hatch.version]
-path = "..."
 
 [tool.hatch.build.targets.wheel]
 packages = ["blower_tester/"]
