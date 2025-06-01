@@ -100,4 +100,4 @@ function install_main {
 
 }
 
-install_main()
+install_main
