@@ -82,6 +82,8 @@ function install_main {
   cp_udev_rule
 
   sudo chmod +x $BLOWER_EXEC_FILE
+  sudo mkdir -p $BLOWER_INSTALL_DIR/bin $BLOWER_INSTALL_DIR/src 
+  
   sudo cp $BLOWER_EXEC_FILE $BLOWER_INSTALL_DIR/bin/ 
   sudo cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
   sudo cp .env $BLOWER_INSTALL_DIR/src/$BLOWER_PY_APP.env
