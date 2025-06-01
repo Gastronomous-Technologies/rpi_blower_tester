@@ -28,4 +28,5 @@ WORKDIR /home/app
 #Copy in the source code
 COPY . .
 
+RUN pip install .
 CMD ["python", "-m", "."]
