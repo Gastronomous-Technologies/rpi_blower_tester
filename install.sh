@@ -2,7 +2,6 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
-SERVICE_FILE=$(ls *.service)
 FD_RULES=$(ls *stlinkv2*.rules)
 
 function inst_docker {
@@ -50,13 +49,13 @@ function inst_serv {
   #Systemd Service Installation
   echo "Installing systemd blower service"
 
-  sudo cp $SERVICE_FILE /etc/systemd/system/
-  sudo chmod 700 /etc/systemd/system/$SERVICE_FILE
-  sudo chgrp root /etc/systemd/system/$SERVICE_FILE 
+  sudo cp $BLOWER_SERVICE_FILE /etc/systemd/system/
+  sudo chmod 700 /etc/systemd/system/$BLOWER_SERVICE_FILE
+  sudo chgrp root /etc/systemd/system/$BLOWER_SERVICE_FILE 
 
-  sudo cp $SERVICE_FILE /usr/lib/systemd/system/
-  sudo chmod 600 /usr/lib/systemd/system/$SERVICE_FILE
-  sudo chgrp root /usr/lib/systemd/system/$SERVICE_FILE
+  sudo cp $BLOWER_SERVICE_FILE /usr/lib/systemd/system/
+  sudo chmod 600 /usr/lib/systemd/system/$BLOWER_SERVICE_FILE
+  sudo chgrp root /usr/lib/systemd/system/$BLOWER_SERVICE_FILE
 
   sudo systemctl daemon-reload
 }
@@ -83,7 +82,7 @@ function install_main {
 
   sudo chmod +x $BLOWER_EXEC_FILE
   sudo mkdir -p $BLOWER_INSTALL_DIR/bin $BLOWER_INSTALL_DIR/src 
-  
+
   sudo cp $BLOWER_EXEC_FILE $BLOWER_INSTALL_DIR/bin/ 
   sudo cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
   sudo cp .env $BLOWER_INSTALL_DIR/src/$BLOWER_PY_APP.env
@@ -94,7 +93,7 @@ function install_main {
   
   if cat /etc/os-release | grep "Raspbian"; then
     echo "RPI detected, enabling on boot"
-    sudo systemctl enable $SERVICE_FILE
+    sudo systemctl enable $BLOWER_SERVICE_FILE
 
     echo "Please enable I2C and SPI through raspi-config and reboot"
     echo "'sudo raspi-config' -> Interface Options ..."
