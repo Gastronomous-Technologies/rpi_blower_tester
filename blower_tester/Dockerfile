@@ -29,4 +29,5 @@ WORKDIR /home/app
 COPY . .
 
 RUN pip install .
-CMD ["python", "-m", "."]
+
+CMD ["python", "-m", "blower_tester"]

@@ -10,6 +10,16 @@ The host machine is a Raspberry Pi Zero 2W. Programming of the device under test
 ### Working Principle
 A systemd service starts a docker container that launches a python application. The python application will prompt the user to complete some operations and input y/n feedback and then the stlink will program the DUT to complete some tests, check the thermocouples, drive the fans, etc. This isn't yet completed.
 
+### API Information
+After installation run
+```sh
+rpi_blower_app --help
+```
+or 
+```sh
+man rpi_blower_app
+```
+
 ### OS Support
 Raspbian, Deb-Based Linux
 

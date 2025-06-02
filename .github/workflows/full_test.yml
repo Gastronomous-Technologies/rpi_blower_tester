@@ -14,10 +14,10 @@ jobs:
       run: sudo chmod +x install.sh && ./install.sh
 
     - name: Build
-      run: rpi_blower_tester build
+      run: rpi_blower_tester --build
 
     - name: Test
-      run: rpi_blower_tester test
+      run: rpi_blower_tester --test
 
     - name: Uninstall
       run: ./uninstall.sh
