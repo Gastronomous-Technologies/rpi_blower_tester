@@ -13,7 +13,7 @@ do
 
     -b|--build)
       echo "Building/Rebuilding "$BLOWER_APP_NAME" Version: "$BLOWER_APP_VERSION
-      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/../src/$BLOWER_PY_APP/
+      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/src/$BLOWER_PY_APP/
     ;;
 
     -h|--help)
@@ -21,6 +21,7 @@ do
       ;;
 
     -r|--run)
+      clear
       echo "Running "$BLOWER_APP_NAME
       docker run --rm -it --device=$(ls /dev/stlinkv2*) $BLOWER_APP_NAME
     ;;
