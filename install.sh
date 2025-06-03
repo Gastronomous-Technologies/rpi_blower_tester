@@ -39,7 +39,7 @@ function inst_docker {
     echo "export DOCKER_HOST=unix://run/user/1000/docker.sock" >> ~/.bashrc
   fi
 
-  source ~/.bashrc
+  . ~/.bashrc
 
   dockerd-rootless-setuptool.sh install
   docker context use rootless
@@ -52,18 +52,16 @@ function inst_serv {
   echo "Installing systemd blower service"
 
   sudo cp $BLOWER_SERVICE_FILE /etc/systemd/system/
+
   sudo sed -i -e "s|INSTALL_DIR|${BLOWER_INSTALL_DIR::-1}|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
   sudo sed -i -e "s|PROGRAM_NAME|$BLOWER_EXEC_FILE|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
+  sudo sed -i -e "s|BLOWER_USER|$USER|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
 
   sudo chmod 700 /etc/systemd/system/$BLOWER_SERVICE_FILE
   sudo chgrp root /etc/systemd/system/$BLOWER_SERVICE_FILE 
 
-  sudo cp $BLOWER_SERVICE_FILE /usr/lib/systemd/system/
-  sudo sed -i -e "s|INSTALL_DIR|${BLOWER_INSTALL_DIR::-1}|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
-  sudo sed -i -e "s|PROGRAM_NAME|$BLOWER_EXEC_FILE|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
-
+  sudo cp /etc/systemd/system/$BLOWER_SERVICE_FILE /usr/lib/systemd/system/
   sudo chmod 600 /usr/lib/systemd/system/$BLOWER_SERVICE_FILE
-  sudo chgrp root /usr/lib/systemd/system/$BLOWER_SERVICE_FILE
 
   sudo systemctl daemon-reload
 }
@@ -92,6 +90,7 @@ function install_main {
   sudo mkdir -p $BLOWER_INSTALL_DIR/bin $BLOWER_INSTALL_DIR/src $BLOWER_INSTALL_DIR/share/man/man1
 
   sudo cp $BLOWER_EXEC_FILE $BLOWER_INSTALL_DIR/bin/ 
+  sudo sed -i -e "s|INSTALL_DIR|$BLOWER_INSTALL_DIR|g" $BLOWER_INSTALL_DIR/bin/$BLOWER_EXEC_FILE
   sudo cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
 
   sudo cp man.1 $BLOWER_INSTALL_DIR/man/man1/$BLOWER_EXEC_FILE.1
@@ -105,7 +104,7 @@ function install_main {
   printf "\033[0;32m\nInstallation complete\n\033[0m"
   
   if cat /proc/device-tree/model || grep "Raspberry"; then
-    echo "RPI detected, enabling on boot and setting up hardware peripherals"
+    echo " detected, enabling on boot and setting up hardware peripherals"
 
     sudo systemctl enable $BLOWER_SERVICE_FILE
 
@@ -116,7 +115,7 @@ function install_main {
     sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/firmware/config.txt
     sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/firmware/config.txt
 
-    echo  "Please reboot Raspberry Pi for changes to take effect"
+    printf  "Please reboot Raspberry Pi for changes to take effect\n"
   fi
 
 }
