@@ -21,7 +21,6 @@ do
       ;;
 
     -r|--run)
-      clear
       echo "Running "$BLOWER_APP_NAME
       docker run --rm -it --device=$(ls /dev/stlinkv2*) $BLOWER_APP_NAME
     ;;
