@@ -103,7 +103,7 @@ function install_main {
 
   printf "\033[0;32m\nInstallation complete\n\033[0m"
   
-  if cat /proc/device-tree/model || grep "Raspberry"; then
+  if cat /sys/firmware/devicetree/base/model || grep "Raspberry Pi Zero 2 W"; then
     echo " detected, enabling on boot and setting up hardware peripherals"
 
     sudo systemctl enable $BLOWER_SERVICE_FILE
