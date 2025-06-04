@@ -19,12 +19,20 @@ def _meas_tc2():
 def _spin_fan1():
     pass
 
+def _spin_fan2():
+    pass
+
+def _spin_fan3():
+    pass
+
 dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])
 
 test_seq = [
     dut_test("power LEDs",     _pwr_on,    "Two leds on?", "for power shorts/opens"),
-    dut_test("program MCU",    _prog_mcu,   None,          "U4, cannot communicate"),
-    dut_test("thermocouple 1", _meas_tc1,   None,          "CN3, U1 and passive components"),
-    dut_test("thermocouple 2", _meas_tc2,   None,          "CN4, U2 and passive components"),
-    dut_test("fan 1",          _spin_fan1,  None,          "tbd")
+    dut_test("program MCU",    _prog_mcu,   None,          None),
+    dut_test("thermocouple 1", _meas_tc1,   None,          None),
+    dut_test("thermocouple 2", _meas_tc2,   None,          None),
+    dut_test("fan 1",          _spin_fan1,  "Fan 1 spun?", "Q1 or R25"),
+    dut_test("fan 2",          _spin_fan2,  "Fan 2 spun?", "Q2 or R26"),
+    dut_test("fan 3",          _spin_fan3,  "Fan 3 spun?", "Q2 or R29")
 ]

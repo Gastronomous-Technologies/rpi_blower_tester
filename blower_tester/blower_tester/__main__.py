@@ -47,6 +47,10 @@ def handle_user_prompt(test_def):
 
         res = input()
 
+    if res == 'e':
+        logging.info("Exiting test sequence")
+        early_exit = True
+
     return early_exit
 
 def blower_main():
@@ -70,10 +74,9 @@ def blower_main():
     while True:
         if brd_num == 0:
             logging.info("Press enter to test GOOD PCBA")
+            input() #Delay starting test sequence until user is ready
         else:
             logging.info("PCBA {:d} test".format(brd_num))
-
-        input() #Delay starting test sequence until user is ready
 
         test_index = 0; exit_test = False
 
@@ -83,21 +86,20 @@ def blower_main():
             #Test requires user input
             if test_def.prompt is not None:
                 logging.info("Testing {:s}".format(test_def.name))
-                err = test_def.func()
+                err_msg = test_def.func()
                 logging.info(test_def.prompt)
 
-                if err is None:
-                    exit_test = handle_user_prompt(test_def)
+                if err_msg is None: exit_test = handle_user_prompt(test_def)
 
             #Automatic test
             else:
-                err = test_def.func()
-                test_res = "passed" if err is None else "failed"
+                err_msg = test_def.func()
+                test_res = "passed" if err_msg is None else "failed"
                 logging.info("Testing {:s}: {:s}".format(test_def.name, test_res))
 
-                if err:
-                    logging.error("Check {:s}".format(test_def.debug_prompt))
-                    exit_test = True
+            if err_msg is not None:
+                exit_test = True
+                logging.error(err_msg)
 
             if exit_test: test_index = len(test_seq)
             else: test_index += 1
