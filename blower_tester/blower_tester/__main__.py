@@ -31,7 +31,7 @@ def handle_user_prompt(test_def):
             time.sleep(2)
 
         if res == 'n' or res == '?':
-            logging.info("Testing {:s}: {:s}".format(test_def.name, test_def.prompt))
+            logging.info("Testing {:s}: {:s}".format(test_def.name, test_def.prompt.lower()))
             test_def.func()
 
         else:
