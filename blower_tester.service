@@ -5,7 +5,8 @@ After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/openvt -c 12 -s -w -- sudo -H -u BLOWER_USER INSTALL_DIR/bin/PROGRAM_NAME --run
+ExecStartPre=/usr/bin/chvt 7
+ExecStart=/usr/bin/openvt -c 7 -s -w -- sudo -H -u BLOWER_USER INSTALL_DIR/bin/PROGRAM_NAME --run
 
 [Install]
 WantedBy=multi-user.target

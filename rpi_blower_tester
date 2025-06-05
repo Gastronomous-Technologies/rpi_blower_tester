@@ -5,8 +5,6 @@ docker context use rootless
 
 . $SCRIPT_DIR/src/*.env
 
-chvt 12 #as in service file
-
 for cmd in "$@"
 
 do
