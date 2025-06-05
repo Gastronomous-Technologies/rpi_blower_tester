@@ -7,7 +7,7 @@ RUN apt-get update && \
     usbutils build-essential -y
 
 #Create a non-root user to run the application
-RUN useradd app && adduser app dialout
+RUN useradd app
 USER app
 WORKDIR /home/app
 
@@ -28,6 +28,7 @@ WORKDIR /home/app
 #Copy in the source code
 COPY . .
 
+ENV PATH="/home/app/.local/bin:$PATH"
 RUN pip install .
 
 CMD ["python", "-m", "blower_tester"]

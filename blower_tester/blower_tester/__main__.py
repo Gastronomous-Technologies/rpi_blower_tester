@@ -2,9 +2,8 @@ import logging
 import time
 import os
 from subprocess import run
-from digitalio import Direction
 
-from .config import platform_check, pins
+from .config import pins
 from .config import text_colour as tc
 
 from .dut_tests import test_seq
@@ -20,13 +19,6 @@ def disp_start_info():
 
 def initialize():
     logging.debug("Initializing GPIO pins")
-
-    pins.alert.direction = Direction.INPUT
-    pins.cs.direction = Direction.OUTPUT
-    pins.pwr_en.direction = Direction.OUTPUT
-
-    pins.cs.value = True
-    pins.pwr_en.value = True
 
 def handle_user_prompt(test_def):
     early_exit = False
@@ -58,13 +50,6 @@ def blower_main():
                         datefmt='%s', level=logging.INFO)
 
     run("cls" if os.name == 'nt' else "clear", shell=True)
-
-    if not platform_check():
-        logging.critical("Blower main must be ran on Blower Thermocouple Tester: CG5-TEST-E-019")
-        logging.critical("Exiting...")
-
-        time.sleep(5)
-        raise Exception
 
     disp_start_info()
     initialize()

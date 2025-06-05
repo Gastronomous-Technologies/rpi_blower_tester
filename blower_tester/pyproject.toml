@@ -8,7 +8,7 @@ version = "06.2025"
 
 dependencies = [
   "pytest",
-  "adafruit-blinka"
+  "gpiozero"
 ]
 
 requires-python = ">=3.0"

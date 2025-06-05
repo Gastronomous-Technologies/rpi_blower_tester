@@ -22,7 +22,13 @@ do
 
     -r|--run)
       echo "Running "$BLOWER_APP_NAME
-      docker run --rm -it --device=$(ls /dev/stlinkv2*) $BLOWER_APP_NAME
+
+      GPIO_GID=$(getent group gpio | cut -d: -f3)
+      DIALOUT_GID=$(getent group dialout | cut -d: -f3)
+
+      docker run --device=/dev/gpiomem --device=/dev/gpiochip0 \
+                 --device=$(ls /dev/stlinkv2*) --device=/dev/spidev0.0 \
+                 -v /sys/bus/i2c:/sys/bus/i2c --rm -it $BLOWER_APP_NAME
     ;;
 
     -t|--test)

@@ -45,6 +45,7 @@ function inst_docker {
   docker context use rootless
   sudo loginctl enable-linger $USER
   systemctl --user start docker.service
+  sudo usermod -aG docker $USER
 }
 
 function inst_serv {
@@ -102,7 +103,7 @@ function install_main {
   docker build -t $BLOWER_APP_NAME $BLOWER_INSTALL_DIR/src/$BLOWER_PY_APP/
 
   printf "\033[0;32m\nInstallation complete\n\033[0m"
-  
+
   if cat /sys/firmware/devicetree/base/model || grep "Raspberry Pi Zero 2 W"; then
     echo " detected, enabling on boot and setting up hardware peripherals"
 
@@ -114,6 +115,10 @@ function install_main {
 
     sudo sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/firmware/config.txt
     sudo sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/firmware/config.txt
+
+    sudo sed -i -e 's/660/666/g' /etc/udev/rules.d/99-com.rules
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
 
     printf  "Please reboot Raspberry Pi for changes to take effect\n"
   fi
