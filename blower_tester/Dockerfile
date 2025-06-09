@@ -7,7 +7,8 @@ RUN apt-get update && \
     usbutils build-essential -y
 
 #Create a non-root user to run the application
-RUN useradd app
+RUN useradd app && adduser app dialout
+
 USER app
 WORKDIR /home/app
 

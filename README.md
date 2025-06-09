@@ -25,10 +25,10 @@ Raspbian, Deb-Based Linux
 
 ## Install
 ```sh
-sudo chmod +x install.sh && ./install.sh
+sudo ./install.sh
 ```
 
 ## Uninstall
 ```sh
-./uninstall.sh
+sudo ./uninstall.sh
 ```
