@@ -13,3 +13,8 @@ class pins:
     pwr_en = OutputDevice(26, initial_value=False)
 
 thermocouple_tol = 10 #%
+
+stm_bin_fd = "thermal_monitor.bin"
+
+fan_speed_tol = 10 #%
+fan_speed = 5000 #RPM

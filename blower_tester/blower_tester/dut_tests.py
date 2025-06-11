@@ -1,8 +1,10 @@
 import logging
 from collections import namedtuple
+from subprocess import run
+from os import path
 
 from TMP1075 import TMP075
-from .config import pins, thermocouple_tol
+from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol
 
 temp_sensor = TMP1075()
 
@@ -15,7 +17,33 @@ def pwr_off():
     pins.pwr_en.value = False
 
 def prog_mcu():
-    pass
+    logging.debug("Programming MCU...")
+
+    bin_dir = "{:s}/lib/{:s}".format(path.dirname(path.abspath(__file__)), stm_bin_fd)
+    res = run(["st-flash", "write", bin_dir, "0x8000000"]) #Not sure this is the correct address
+
+    if res.returncode == 0:
+        err = None
+        logging.debug("Programming successful")
+    else:
+        err = "Cannot program STM32!, check U4")
+
+    return err
+
+def spi_ack():
+    logging.debug("Testing SPI communications to STM")
+
+    #Here we want an acknowledgement that we can communicate to the STM through SPI"
+    spi_ack = True #Call some function here to test SPI
+
+    if spi_ack:
+        err = None
+        logging.debug("SPI communications check successful")
+
+    else:
+        err = "U4, CN2"
+
+    return err
 
 def meas_tc1():
     tc1_temp = 25 #NOTE Get the temperature from the STM board instead
@@ -25,7 +53,7 @@ def meas_tc2():
     tc2_temp = 25 #NOTE Get the temperature from the STM board instead
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
-def _check_tc(tc_num, tc_temp, designators):
+def _check_tc(tc_num, tc_temp, fail_designators):
     room_temp = temp_sensor.get_temperature()
 
     logging.debug("Room Temperature: {.2f} C".format(room_temp))
@@ -36,27 +64,43 @@ def _check_tc(tc_num, tc_temp, designators):
         logging.debug("Thermocouple {:d} test pass")
 
     else:
-        err = "Thermocouple {:d} test failure, check {:s}".format(tc_num, designators)
+        err = "Thermocouple {:d} test failure, check {:s}".format(tc_num, fail_designators)
 
     return err
 
-def meas_tc2():
-    pass
+def _check_fan(fan_num, desired_rpm, fail_designators):
+    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_fan_rpm))
+
+    #Please call some function here to spin the fan
+    measured_rpm = fan_speed #Change this to the actual measured RPM value
+
+    logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, fan_rpm))
+
+    if 100 * abs((desired_rpm - measured_rpm) / desired_fan_rpm) < fan_speed_tol:
+        err = None
+        logging.debug("Fan {:d} test pass")
+
+    else:
+        err = "Fan {:d} test failure, check {:s}".format(fan_num, fail_designators)
+
+    return err
 
 def spin_fan1():
-    pass
+    return _check_fan(1, fan_speed, "R18, R19, R25, C12, D4, Q1")
 
 def spin_fan2():
-    pass
+    return _check_fan(2, fan_speed, "R20, R21, R26, C13, D5, Q2")
 
 def spin_fan3():
-    pass
+    return _check_fan(3, fan_speed, "R22, R23, R29, C14, D6, Q3")
 
 dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])
 
+#Offer debug prompts for manual tests which fail
 test_seq = [
     dut_test("power LEDs",     pwr_on,    "Two leds on?", "for power shorts/opens"),
     dut_test("program MCU",    prog_mcu,   None,          None),
+    dut_test("SPI comms",      spi_ack,    None,          None),
     dut_test("thermocouple 1", meas_tc1,   None,          None),
     dut_test("thermocouple 2", meas_tc2,   None,          None),
     dut_test("fan 1",          spin_fan1,  None,          None),
