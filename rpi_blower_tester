@@ -1,4 +1,4 @@
-SCRIPT_DIR=/usr/local/
+SCRIPT_DIR=INSTALL_DIR
 
 unset DOCKER_HOST
 docker context use default

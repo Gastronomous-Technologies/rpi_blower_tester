@@ -1,27 +1,17 @@
 FROM arm64v8/python
 
 #STM32 Programmer prerequisites
-#https://freeelectron.ro/installing-st-link-v2-to-flash-stm32-targets-on-linux/
+#As per compiling.md (github.com/stlink-org/stlink/blob/testing/doc/compiling.md)
 RUN apt-get update && \
-    apt-get install git make cmake libusb-1.0.0-dev gcc \
-    usbutils build-essential -y
+    apt-get install gcc build-essential cmake rpm \
+    libusb-1.0.0 libusb-1.0.0-dev libgtk-3-dev pandoc -y
+
+#Install stlink 
+RUN git clone https://github.com/stlink-org/stlink.git && cd stlink && \
+    make clean && make release && make install && ldconfig 
 
 #Create a non-root user to run the application
 RUN useradd app && adduser app dialout
-
-USER app
-WORKDIR /home/app
-
-#Install stlink 
-RUN mkdir stm32 && cd stm32 && \
-    git clone https://github.com/stlink-org/stlink && \
-    cd stlink && cmake . && make 
-
-USER root
-WORKDIR /home/app/stm32/stlink
-
-RUN cd bin && cp st-* /usr/local/bin && \ 
-    cd ../lib && cp *.so* /lib
 
 USER app
 WORKDIR /home/app
@@ -32,4 +22,4 @@ COPY . .
 ENV PATH="/home/app/.local/bin:$PATH"
 RUN pip install .
 
-CMD ["python", "-m", "blower_tester"]
+CMD ["sleep", "10000"]

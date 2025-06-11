@@ -1,5 +1,3 @@
-import warnings
-warnings.simplefilter('ignore')
 from gpiozero import OutputDevice, InputDevice
 
 class text_colour:
@@ -13,3 +11,5 @@ class pins:
     alert  = InputDevice(4)
     cs     = OutputDevice(8, initial_value=True)
     pwr_en = OutputDevice(26, initial_value=False)
+
+thermocouple_tol = 10 #%

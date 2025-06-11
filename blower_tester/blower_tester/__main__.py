@@ -6,7 +6,7 @@ from subprocess import run
 from .config import pins
 from .config import text_colour as tc
 
-from .dut_tests import test_seq
+from .dut_tests import test_seq, pwr_off
 
 def disp_start_info():
     logging.info(f"{tc.bold}CG5-ELEC-E-019 BlowerThermocouple Tester{tc.rst}")
@@ -79,7 +79,7 @@ def blower_main():
             #Automatic test
             else:
                 err_msg = test_def.func()
-                test_res = "passed" if err_msg is None else "failed"
+                test_res = "Passed" if err_msg is None else "Failed"
                 logging.info("Testing {:s}: {:s}".format(test_def.name, test_res))
 
             if err_msg is not None:
@@ -90,8 +90,9 @@ def blower_main():
             else: test_index += 1
 
         test_res = f"{tc.green}PASS" if not exit_test else f"{tc.red}FAIL"
-
         logging.info(f"Board test complete, result is {test_res}{tc.rst}\n")
+
+        pwr_off()
 
         time.sleep(2)
         logging.info("Unload current PCBA and hit enter")
