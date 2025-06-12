@@ -8,7 +8,8 @@ version = "06.2025"
 
 dependencies = [
   "pytest",
-  "gpiozero"
+  "gpiozero",
+  "smbus2"
 ]
 
 requires-python = ">=3.0"

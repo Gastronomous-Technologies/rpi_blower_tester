@@ -32,7 +32,7 @@ function inst_serv {
   sed -i -e "s|PROGRAM_NAME|$BLOWER_EXEC_FILE|g" /etc/systemd/system/$BLOWER_SERVICE_FILE
 
   chmod 700 /etc/systemd/system/$BLOWER_SERVICE_FILE
-  chgrp root /etc/systemd/system/$BLOWER_SERVICE_FILE 
+  chgrp root /etc/systemd/system/$BLOWER_SERVICE_FILE
 
   cp /etc/systemd/system/$BLOWER_SERVICE_FILE /usr/lib/systemd/system/
   chmod 600 /usr/lib/systemd/system/$BLOWER_SERVICE_FILE
@@ -52,7 +52,7 @@ function install_main {
 
   echo "Beginning installation of "$BLOWER_APP_NAME" -- Version: "$BLOWER_APP_VERSION")"
 
-  apt-get update 
+  apt-get update
   apt-get install -y git ca-certificates curl
 
   inst_docker
@@ -63,7 +63,7 @@ function install_main {
   mkdir -p $BLOWER_INSTALL_DIR/bin $BLOWER_INSTALL_DIR/src $BLOWER_INSTALL_DIR/share/man/man1
 
   cp $BLOWER_EXEC_FILE $BLOWER_INSTALL_DIR/bin/
-  sed -i -e "s|INSTALL_DIR|$BLOWER_INSTALL_DIR{::-1}|g" $BLOWER_INSTALL_DIR/bin/$BLOWER_EXEC_FILE
+  sed -i -e "s|INSTALL_DIR|${BLOWER_INSTALL_DIR::-1}|g" $BLOWER_INSTALL_DIR/bin/$BLOWER_EXEC_FILE
   cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
 
   cp man.1 $BLOWER_INSTALL_DIR/man/man1/$BLOWER_EXEC_FILE.1

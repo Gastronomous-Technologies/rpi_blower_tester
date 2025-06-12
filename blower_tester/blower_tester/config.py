@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter('ignore')
+
 from gpiozero import OutputDevice, InputDevice
 
 class text_colour:
@@ -9,12 +12,13 @@ class text_colour:
 
 class pins:
     alert  = InputDevice(4)
-    cs     = OutputDevice(8, initial_value=True)
     pwr_en = OutputDevice(26, initial_value=False)
 
-thermocouple_tol = 10 #%
+thermocouple_tol = 30 #%
 
 stm_bin_fd = "thermal_monitor.bin"
 
 fan_speed_tol = 10 #%
 fan_speed = 5000 #RPM
+
+tmp1075_addr = 0x48

@@ -22,4 +22,4 @@ COPY . .
 ENV PATH="/home/app/.local/bin:$PATH"
 RUN pip install .
 
-CMD ["sleep", "10000"]
+CMD ["python", "-m", "blower_tester"]

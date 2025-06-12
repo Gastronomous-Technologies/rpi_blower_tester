@@ -1,12 +1,10 @@
 import logging
 from collections import namedtuple
-from subprocess import run
+import subprocess as sp
 from os import path
+from smbus2 import SMBus
 
-from TMP1075 import TMP075
-from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol
-
-temp_sensor = TMP1075()
+from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol, tmp1075_addr
 
 def pwr_on():
     logging.debug("Asserting power enable pin")
@@ -17,16 +15,25 @@ def pwr_off():
     pins.pwr_en.value = False
 
 def prog_mcu():
-    logging.debug("Programming MCU...")
+    logging.info("Programming MCU...")
 
-    bin_dir = "{:s}/lib/{:s}".format(path.dirname(path.abspath(__file__)), stm_bin_fd)
-    res = run(["st-flash", "write", bin_dir, "0x8000000"]) #Not sure this is the correct address
+    bin_dir = "{:s}/lib/{:s}".format(path.dirname(path.dirname(path.abspath(__file__))), stm_bin_fd)
 
-    if res.returncode == 0:
-        err = None
-        logging.debug("Programming successful")
+    #Not sure this is the correct address
+    cmdline_args = ["st-flash", "--freq=4M", "--reset", "write", bin_dir, "0x8000000"]
+
+    try:
+        cmdline_process = sp.Popen(cmdline_args, stdout=sp.PIPE, stderr=sp.STDOUT)
+        process_out, _ = cmdline_process.communicate()
+        logging.debug(process_out.decode("utf-8"))
+
+    except(OSError, CalledProcessError) as exception:
+        logging.error("Exception occured: {}".format(exception))
+        err = "Cannot program STM32!, check U4"
+
     else:
-        err = "Cannot program STM32!, check U4")
+        logging.info("Programming successful")
+        err = None
 
     return err
 
@@ -45,6 +52,13 @@ def spi_ack():
 
     return err
 
+def _tmp1075_temp():
+    ADDR = 0x48
+    TEMP_REG = 0x00
+
+    raw = SMBus(1).read_i2c_block_data(ADDR, TEMP_REG, 2)
+    return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
+
 def meas_tc1():
     tc1_temp = 25 #NOTE Get the temperature from the STM board instead
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
@@ -54,14 +68,14 @@ def meas_tc2():
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
 def _check_tc(tc_num, tc_temp, fail_designators):
-    room_temp = temp_sensor.get_temperature()
+    room_temp = _tmp1075_temp()
 
-    logging.debug("Room Temperature: {.2f} C".format(room_temp))
-    logging.debug("Thermocouple {:d} Temperature: {.2f} C".format(tc_num, tc1_temp))
+    logging.debug("Room Temperature: {:.2f} C".format(room_temp))
+    logging.debug("Thermocouple {:d} Temperature: {:.2f} C".format(tc_num, tc_temp))
 
-    if 100 * abs((tc1_temp - room_temp) / room_temp) < thermocouple_tol:
+    if 100 * abs((tc_temp - room_temp) / room_temp) < thermocouple_tol:
         err = None
-        logging.debug("Thermocouple {:d} test pass")
+        logging.debug("Thermocouple {:d} test pass".format(tc_num))
 
     else:
         err = "Thermocouple {:d} test failure, check {:s}".format(tc_num, fail_designators)
@@ -69,16 +83,16 @@ def _check_tc(tc_num, tc_temp, fail_designators):
     return err
 
 def _check_fan(fan_num, desired_rpm, fail_designators):
-    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_fan_rpm))
+    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
 
     #Please call some function here to spin the fan
     measured_rpm = fan_speed #Change this to the actual measured RPM value
 
-    logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, fan_rpm))
+    logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
-    if 100 * abs((desired_rpm - measured_rpm) / desired_fan_rpm) < fan_speed_tol:
+    if 100 * abs((desired_rpm - measured_rpm) / desired_rpm) < fan_speed_tol:
         err = None
-        logging.debug("Fan {:d} test pass")
+        logging.debug("Fan {:d} test pass".format(fan_num))
 
     else:
         err = "Fan {:d} test failure, check {:s}".format(fan_num, fail_designators)
