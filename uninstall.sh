@@ -2,7 +2,7 @@
 #Should be run as root
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cd $SCRIPT_DIR && source .env
+cd $SCRIPT_DIR && . .env
 
 #Completely remove the program
 rm $BLOWER_INSTALL_DIR/bin/$BLOWER_EXEC_FILE \
