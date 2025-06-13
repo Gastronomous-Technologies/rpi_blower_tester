@@ -7,15 +7,22 @@ from subprocess import run
 from .config import pins
 from .config import text_colour as tc
 
-from .dut_tests import test_seq, pwr_off
+from .dut_tests import test_seq, pwr_on, pwr_off
 
 def disp_start_info():
     logging.info(f"{tc.bold}CG5-ELEC-E-019 BlowerThermocouple Tester{tc.rst}")
     logging.info("Supports Version v2.1+ PCBs\n")
-    logging.info("Enter y (yes) to confirm and complete next test")
-    logging.info("Enter n (no) to offer debug and retest")
-    logging.info("Enter ? (unsure) to retest")
-    logging.info("Enter e (exit) to exit test")
+
+    display_guide = False
+    for test in test_seq:
+        if test.prompt is not None: display_guide = True
+
+    if display_guide:
+        logging.info("Enter y (yes) to confirm and complete next test")
+        logging.info("Enter n (no) to offer debug and retest")
+        logging.info("Enter ? (unsure) to retest")
+        logging.info("Enter e (exit) to exit test")
+
     logging.info("All prompts refer to the board under test\n")
 
 def initialize():
@@ -74,6 +81,8 @@ def blower_main():
             logging.info("PCBA {:d} test".format(brd_num))
 
         test_index = 0; exit_test = False
+
+        pwr_on()
 
         while test_index < len(test_seq):
             test_def = test_seq[test_index]

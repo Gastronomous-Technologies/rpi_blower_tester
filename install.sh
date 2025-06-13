@@ -85,8 +85,18 @@ function install_main {
       sed -i '1s/^/video=HDMI-A-1:1280x720M@60 /' /boot/firmware/cmdline.txt
     fi
 
-    sed -i -e 's/#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g' /boot/firmware/config.txt
-    sed -i -e 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/firmware/config.txt
+    #SPI enable
+    sed -i -e 's/#dtparam=spi/dtparam=spi/g' /boot/firmware/config.txt
+    sed -i -e 's/dtparam=spi=off/dtparam=spi=on/g' /boot/firmware/config.txt
+
+    #I2C enable
+    sed -i -e 's/#dtparam=i2c_arm/dtparam=i2c_arm/g' /boot/firmware/config.txt
+    sed -i -e 's/dtparam=i2c_arm=off/dtparam=i2c_arm=on/g' /boot/firmware/config.txt
+
+    if ! grep -q "^i2c[-_]dev" /etc/modules; then
+        printf "i2c-dev\n" >> /etc/modules
+    fi
+    modprobe i2c-dev
 
     printf  "Please reboot Raspberry Pi for changes to take effect\n"
   fi
