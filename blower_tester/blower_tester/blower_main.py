@@ -1,7 +1,7 @@
 import logging
 import time
 
-from .config import text_colour as tc, pins
+from .config import text_colour as tc, running_on_act_hw
 from .dut_tests import get_test_seq, pwr_on, pwr_off
 
 def disp_start_info():
@@ -87,20 +87,25 @@ def blower_main():
     disp_start_info()
     brd_num = 0
 
-    while True:
-        if brd_num == 0:
-            logging.info("Press enter to test GOOD PCBA")
-            input() #Delay starting test sequence until user is ready
-        else:
-            logging.info("PCBA {:d} test".format(brd_num))
+    if running_on_act_hw():
+        while True:
+            if brd_num == 0:
+                logging.info("Press enter to test GOOD PCBA")
+                input() #Delay starting test sequence until user is ready
+            else:
+                logging.info("PCBA {:d} test".format(brd_num))
 
-        err = test_brd()
+            err = test_brd()
 
-        test_res = f"{tc.green}PASS" if not err else f"{tc.red}FAIL"
-        logging.info(f"Board test complete, result is {test_res}{tc.rst}\n")
+            test_res = f"{tc.green}PASS" if not err else f"{tc.red}FAIL"
+            logging.info(f"Board test complete, result is {test_res}{tc.rst}\n")
 
-        time.sleep(2)
-        logging.info("Unload current PCBA and hit enter")
-        input()
+            time.sleep(2)
+            logging.info("Unload current PCBA and hit enter")
+            input()
 
-        brd_num += 1
+            brd_num += 1
+
+    else:
+        logging.exception("Cannot execute actual program if not Running on RPI Zero 2 W")
+        raise Exception

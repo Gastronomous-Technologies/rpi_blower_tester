@@ -1,5 +1,7 @@
-import os
+import logging
 import warnings
+from subprocess import check_output
+
 warnings.simplefilter('ignore')
 
 from gpiozero import OutputDevice, InputDevice
@@ -11,8 +13,21 @@ class text_colour:
     red = '\033[31m'
     rst = '\033[0m'
 
+def running_on_act_hw():
+    act_hw = False
+
+    try:
+        if check_output(["cat", "/sys/firmware/devicetree/base/model", 
+                                "||", "grep", "Raspberry Pi Zero 2 W"]):
+            act_hw = True
+            logging.debug("Running on actual hardware")
+
+    except: logging.debug("Not running on actual hardware")
+
+    return act_hw
+
 class pins:
-    if os.name != 'nt':
+    if running_on_act_hw():
         alert  = InputDevice(4)
         pwr_en = OutputDevice(26, initial_value=False)
 
