@@ -21,10 +21,11 @@ man rpi_blower_app
 ```
 
 ### OS Support
-Program Installation: Raspbian, Deb-Based Linux
-Python App Installation and Unit Tests: Raspbian Deb-Based Linux, Windows 
-Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA
-Program Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA
+Program Installation: Raspbian, Deb-Based Linux \
+Program Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA \
+\
+Python App Installation and Unit Tests: Raspbian, Linux, Windows \
+Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA 
 
 ## Install
 ```sh
