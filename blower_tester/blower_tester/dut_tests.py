@@ -1,10 +1,11 @@
 import logging
 from collections import namedtuple
 import subprocess as sp
-from os import path
-from smbus2 import SMBus
+import os
 
-from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol, tmp1075_addr
+if os.name != 'nt': from smbus2 import SMBus
+from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol
+
 from .stm32 import do_spi_ack, get_tc_temp, set_fan_speed, get_fan_speed
 
 def pwr_on():
@@ -18,7 +19,7 @@ def pwr_off():
 def prog_mcu():
     logging.info("Programming MCU...")
 
-    bin_dir = "{:s}/lib/{:s}".format(path.dirname(path.dirname(path.abspath(__file__))), stm_bin_fd)
+    bin_dir = "{:s}/lib/{:s}".format(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), stm_bin_fd)
 
     #Not sure this is the correct address
     cmdline_args = ["st-flash", "--freq=4M", "--reset", "write", bin_dir, "0x8000000"]
@@ -32,9 +33,9 @@ def prog_mcu():
             logging.info("Programming sucessful")
             err = None
         else:
-            err = "Failed to program STM32!, check U4"
+            err = "Failed to program STM32!, check U4, check for shorts on 5V or 3.3V rail"
 
-    except(OSError, CalledProcessError) as exception:
+    except(OSError, sp.CalledProcessError) as exception:
         logging.error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
 
@@ -43,14 +44,10 @@ def prog_mcu():
 def spi_ack():
     logging.debug("Testing SPI communications to STM")
 
-    #Here we want an acknowledgement that we can communicate to the STM through SPI"
     err = do_spi_ack()
 
-    if err is None:
-        logging.debug("SPI communications check successful")
-
-    else:
-        logging.error("SPI communications check unsuccessful")
+    if err is None: logging.debug("SPI communications check successful")
+    else: logging.error("SPI communications check unsuccessful")
 
     return err
 
@@ -61,11 +58,11 @@ def _tmp1075_temp():
     raw = SMBus(1).read_i2c_block_data(ADDR, TEMP_REG, 2)
     return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
 
-def meas_tc1():
+def test_tc1():
     tc1_temp = get_tc_temp(1)
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
 
-def meas_tc2():
+def test_tc2():
     tc2_temp = get_tc_temp(2)
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
@@ -85,11 +82,13 @@ def _check_tc(tc_num, tc_temp, fail_designators):
     return err
 
 def _check_fan(fan_num, desired_rpm, fail_designators):
-    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
+    desired_rpm = int(desired_rpm)
 
+    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
+    
     #Please call some function here to spin the fan
     set_fan_speed(fan_num, fan_speed)
-    measured_rpm = get_fan_speed(fan_num) #Change this to the actual measured RPM value
+    measured_rpm = int(get_fan_speed(fan_num)) #Change this to the actual measured RPM value
 
     logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
@@ -102,24 +101,25 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
 
     return err
 
-def spin_fan1():
+def test_fan1():
     return _check_fan(1, fan_speed, "R18, R19, R25, C12, D4, Q1")
 
-def spin_fan2():
+def test_fan2():
     return _check_fan(2, fan_speed, "R20, R21, R26, C13, D5, Q2")
 
-def spin_fan3():
+def test_fan3():
     return _check_fan(3, fan_speed, "R22, R23, R29, C14, D6, Q3")
 
-dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])
+def get_test_seq():
+    dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])
 
-#Offer debug prompts for manual tests which fail
-test_seq = [
-    dut_test("program MCU",    prog_mcu,   None,          None),
-    dut_test("SPI comms",      spi_ack,    None,          None),
-    dut_test("thermocouple 1", meas_tc1,   None,          None),
-    dut_test("thermocouple 2", meas_tc2,   None,          None),
-    dut_test("fan 1",          spin_fan1,  None,          None),
-    dut_test("fan 2",          spin_fan2,  None,          None),
-    dut_test("fan 3",          spin_fan3,  None,          None)
-]
+    #Offer debug prompts for manual tests which fail
+    return [
+        dut_test("program MCU",    prog_mcu,   None,          None),
+        dut_test("SPI comms",      spi_ack,    None,          None),
+        dut_test("thermocouple 1", test_tc1,   None,          None),
+        dut_test("thermocouple 2", test_tc2,   None,          None),
+        dut_test("fan 1",          test_fan1,  None,          None),
+        dut_test("fan 2",          test_fan2,  None,          None),
+        dut_test("fan 3",          test_fan3,  None,          None)
+    ]

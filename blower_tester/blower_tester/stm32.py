@@ -1,11 +1,12 @@
 import logging
+from .config import thermocouple_range, fan_range
 
 def do_spi_ack():
     err = None
     return err
 
 def get_tc_temp(tc_ch):
-    if tc_ch not in range(1,3):
+    if tc_ch not in thermocouple_range:
         logging.exception("Error, desired thermocouple number must be 1 or 2")
         raise ValueError
 
@@ -15,7 +16,7 @@ def get_tc_temp(tc_ch):
     return tc_temp
 
 def set_fan_speed(fan_num, fan_speed):
-    if fan_num not in range(1,4):
+    if fan_num not in fan_range:
         logging.exception("Error, desired fan number must be 1,2,3")
         raise ValueError
 
@@ -23,7 +24,7 @@ def set_fan_speed(fan_num, fan_speed):
         pass #Set the fan speed
 
 def get_fan_speed(fan_num):
-    if fan_num not in range(1,4):
+    if fan_num not in fan_range:
         logging.exception("Error, desired fan number must be 1,2,3")
         raise ValueError
 

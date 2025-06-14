@@ -1,124 +1,22 @@
-import argparse
 import logging
-import time
-import os
+import argparse
 from subprocess import run
+import os
 
-from .config import pins
-from .config import text_colour as tc
+from .blower_main import blower_main
 
-from .dut_tests import test_seq, pwr_on, pwr_off
+parser = argparse.ArgumentParser(prog="Blower Tester",
+description="Testing application for CG5-ELEC-E-019 with tester CG5-TEST-E-019",
+    epilog="Supports CG5-ELEC-E-019 v2.1+")
 
-def disp_start_info():
-    logging.info(f"{tc.bold}CG5-ELEC-E-019 BlowerThermocouple Tester{tc.rst}")
-    logging.info("Supports Version v2.1+ PCBs\n")
+parser.add_argument('-v', '--verbose', action='store_true')
+args = parser.parse_args()
 
-    display_guide = False
-    for test in test_seq:
-        if test.prompt is not None: display_guide = True
+log_level = logging.DEBUG if args.verbose else logging.INFO
 
-    if display_guide:
-        logging.info("Enter y (yes) to confirm and complete next test")
-        logging.info("Enter n (no) to offer debug and retest")
-        logging.info("Enter ? (unsure) to retest")
-        logging.info("Enter e (exit) to exit test")
+logging.basicConfig(format="%(levelname)s:      %(message)s",
+                    datefmt='%s', level=log_level)
 
-    logging.info("All prompts refer to the board under test\n")
+run("cls" if os.name == 'nt' else "clear", shell=True)
 
-def initialize():
-    logging.debug("Initializing GPIO pins")
-
-def handle_user_prompt(test_def):
-    early_exit = False
-    res = input()
-
-    while res not in {'y', 'e'}:
-
-        if res == 'n':
-            logging.error("Check {:s}".format(test_def.debug_prompt))
-            time.sleep(2)
-
-        if res == 'n' or res == '?':
-            logging.info("Testing {:s}: {:s}".format(test_def.name, test_def.prompt.lower()))
-            test_def.func()
-
-        else:
-            logging.error("Unrecognized command, please try again...")
-
-        res = input()
-
-    if res == 'e':
-        logging.info("Exiting test sequence")
-        early_exit = True
-
-    return early_exit
-
-def blower_main():
-    parser = argparse.ArgumentParser(prog="Blower Tester",
-	description="Testing application for CG5-ELEC-E-019 with tester CG5-TEST-E-019",
-        epilog="Supports CG5-ELEC-E-019 v2.1+")
-
-    parser.add_argument('-v', '--verbose', action='store_true')
-    args = parser.parse_args()
-
-    log_level = logging.DEBUG if args.verbose else logging.INFO
-
-    logging.basicConfig(format="%(levelname)s:      %(message)s",
-                        datefmt='%s', level=log_level)
-
-    run("cls" if os.name == 'nt' else "clear", shell=True)
-
-    disp_start_info()
-    initialize()
-
-    brd_num = 0
-
-    while True:
-        if brd_num == 0:
-            logging.info("Press enter to test GOOD PCBA")
-            input() #Delay starting test sequence until user is ready
-        else:
-            logging.info("PCBA {:d} test".format(brd_num))
-
-        test_index = 0; exit_test = False
-
-        pwr_on()
-
-        while test_index < len(test_seq):
-            test_def = test_seq[test_index]
-
-            #Test requires user input
-            if test_def.prompt is not None:
-                logging.info("Testing {:s}".format(test_def.name))
-                err_msg = test_def.func()
-                logging.info(test_def.prompt)
-
-                if err_msg is None: exit_test = handle_user_prompt(test_def)
-
-            #Automatic test
-            else:
-                err_msg = test_def.func()
-                test_res = "Passed" if err_msg is None else "Failed"
-                logging.info("Testing {:s}: {:s}".format(test_def.name, test_res))
-
-            if err_msg is not None:
-                exit_test = True
-                logging.error(err_msg)
-
-            if exit_test: test_index = len(test_seq)
-            else: test_index += 1
-
-        test_res = f"{tc.green}PASS" if not exit_test else f"{tc.red}FAIL"
-        logging.info(f"Board test complete, result is {test_res}{tc.rst}\n")
-
-        pwr_off()
-
-        time.sleep(2)
-        logging.info("Unload current PCBA and hit enter")
-        input()
-
-        initialize()
-        brd_num += 1
-
-if __name__ == "__main__":
-    blower_main()
+blower_main()
