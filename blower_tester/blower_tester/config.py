@@ -13,7 +13,7 @@ class text_colour:
     red = '\033[31m'
     rst = '\033[0m'
 
-def running_on_act_hw():
+def act_hw():
     act_hw = False
 
     try:
@@ -27,17 +27,27 @@ def running_on_act_hw():
     return act_hw
 
 class pins:
-    if running_on_act_hw():
+    if act_hw():
         alert  = InputDevice(4)
         pwr_en = OutputDevice(26, initial_value=False)
 
-thermocouple_tol = 30 #%
-thermocouple_range = range(1,3)
+conf = {
+    
+    "tc": { 
+        "range": range(1,3),
+        "tol"  : 30 #%
+    },
+    
+    "tmp1075_addr": 0x48,
 
-stm_bin_fd = "thermal_monitor.bin"
-
-fan_speed_tol = 10 #%
-fan_speed = 5000 #RPM
-fan_range = range(1,4)
-
-tmp1075_addr = 0x48
+    "fan": { 
+        "range": range(1,4),
+        "speed": 5000, #rpm
+        "tol"  :  10 #%
+    },
+    
+    "stm": {
+        "bin_fd" : "thermal_monitor.bin",
+        "addr"   : "0x8000000" #string type
+    }
+}

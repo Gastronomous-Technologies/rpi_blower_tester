@@ -3,8 +3,8 @@ from collections import namedtuple
 import subprocess as sp
 import os
 
-if os.name != 'nt': from smbus2 import SMBus
-from .config import pins, thermocouple_tol, stm_bin_fd, fan_speed, fan_speed_tol
+from .config import pins, conf, act_hw
+if act_hw(): from smbus2 import SMBus
 
 from .stm32 import do_spi_ack, get_tc_temp, set_fan_speed, get_fan_speed
 
@@ -19,10 +19,10 @@ def pwr_off():
 def prog_mcu():
     logging.info("Programming MCU...")
 
-    bin_dir = "{:s}/lib/{:s}".format(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), stm_bin_fd)
+    bin_dir = "{:s}/lib/{:s}".format(\
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), conf["stm"]["bin_fd"])
 
-    #Not sure this is the correct address
-    cmdline_args = ["st-flash", "--freq=4M", "--reset", "write", bin_dir, "0x8000000"]
+    cmdline_args = ["st-flash", "--freq=4M", "--reset", "write", bin_dir, conf["stm"]["addr"]]
 
     try:
         cmdline_process = sp.Popen(cmdline_args, stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -72,7 +72,7 @@ def _check_tc(tc_num, tc_temp, fail_designators):
     logging.debug("Room Temperature: {:.2f} C".format(room_temp))
     logging.debug("Thermocouple {:d} Temperature: {:.2f} C".format(tc_num, tc_temp))
 
-    if 100 * abs((tc_temp - room_temp) / room_temp) < thermocouple_tol:
+    if 100 * abs((tc_temp - room_temp) / room_temp) < conf["tc"]["tol"]:
         err = None
         logging.debug("Thermocouple {:d} test pass".format(tc_num))
 
@@ -86,13 +86,12 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
 
     logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
     
-    #Please call some function here to spin the fan
-    set_fan_speed(fan_num, fan_speed)
-    measured_rpm = int(get_fan_speed(fan_num)) #Change this to the actual measured RPM value
+    set_fan_speed(fan_num, conf["fan"]["speed"])
+    measured_rpm = int(get_fan_speed(fan_num)) 
 
     logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
-    if 100 * abs((desired_rpm - measured_rpm) / desired_rpm) < fan_speed_tol:
+    if 100 * abs((desired_rpm - measured_rpm) / desired_rpm) < conf["fan"]["tol"]:
         err = None
         logging.debug("Fan {:d} test pass".format(fan_num))
 
@@ -102,13 +101,13 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
     return err
 
 def test_fan1():
-    return _check_fan(1, fan_speed, "R18, R19, R25, C12, D4, Q1")
+    return _check_fan(1, conf["fan"]["speed"], "R18, R19, R25, C12, D4, Q1")
 
 def test_fan2():
-    return _check_fan(2, fan_speed, "R20, R21, R26, C13, D5, Q2")
+    return _check_fan(2, conf["fan"]["speed"], "R20, R21, R26, C13, D5, Q2")
 
 def test_fan3():
-    return _check_fan(3, fan_speed, "R22, R23, R29, C14, D6, Q3")
+    return _check_fan(3, conf["fan"]["speed"], "R22, R23, R29, C14, D6, Q3")
 
 def get_test_seq():
     dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])

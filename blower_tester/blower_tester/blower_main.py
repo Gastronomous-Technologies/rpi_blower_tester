@@ -1,7 +1,7 @@
 import logging
 import time
 
-from .config import text_colour as tc, running_on_act_hw
+from .config import text_colour as tc, act_hw
 from .dut_tests import get_test_seq, pwr_on, pwr_off
 
 def disp_start_info():
@@ -87,7 +87,7 @@ def blower_main():
     disp_start_info()
     brd_num = 0
 
-    if running_on_act_hw():
+    if act_hw():
         while True:
             if brd_num == 0:
                 logging.info("Press enter to test GOOD PCBA")

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from blower_tester import blower_main
 
