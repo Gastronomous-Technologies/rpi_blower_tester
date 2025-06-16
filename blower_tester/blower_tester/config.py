@@ -17,8 +17,8 @@ def act_hw():
     act_hw = False
 
     try:
-        if check_output(["cat", "/sys/firmware/devicetree/base/model", 
-                                "||", "grep", "Raspberry Pi Zero 2 W"]):
+        if "Raspberry Pi Zero 2 W" in check_output(["cat",
+		"/sys/firmware/devicetree/base/model"]).decode("utf-8"):
             act_hw = True
             logging.debug("Running on actual hardware")
 
@@ -32,20 +32,20 @@ class pins:
         pwr_en = OutputDevice(26, initial_value=False)
 
 conf = {
-    
-    "tc": { 
+
+    "tc": {
         "range": range(1,3),
         "tol"  : 30 #%
     },
-    
+
     "tmp1075_addr": 0x48,
 
-    "fan": { 
+    "fan": {
         "range": range(1,4),
         "speed": 5000, #rpm
         "tol"  :  10 #%
     },
-    
+
     "stm": {
         "bin_fd" : "thermal_monitor.bin",
         "addr"   : "0x8000000" #string type

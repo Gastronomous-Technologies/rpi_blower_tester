@@ -8,9 +8,11 @@ DIALOUT_GID=$(getent group dialout | cut -d: -f3)
 
 . $SCRIPT_DIR/src/*.env
 
-if [ $# -eq 0 ]; then
-  docker run --privileged --group-add $GPIO_GID --group-add $DIALOUT_GID \
-             -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME
+RUN_CMD="docker run --privileged --group-add $GPIO_GID --group-add $DIALOUT_GID \
+             -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
+
+if [ $# -eq 0 ]; then $RUN_CMD
+  
 else
   for cmd in "$@"
 
@@ -29,8 +31,7 @@ else
 
       -r|--run)
         echo "Running "$BLOWER_APP_NAME
-        docker run --privileged --group-add $GPIO_GID --group-add $DIALOUT_GID \
-             -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME
+        $RUN_CMD
       ;;
 
       -t|--test)

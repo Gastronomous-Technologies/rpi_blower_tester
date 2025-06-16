@@ -53,7 +53,7 @@ def test_brd():
     if test_seq is None:
         logging.critical("No testing sequence loaded!")
         raise ValueError
-    
+
     while test_index < len(test_seq):
         test_def = test_seq[test_index]
 
@@ -89,12 +89,15 @@ def blower_main():
 
     if act_hw():
         while True:
+            logging.info("Please connect ethernet cable to test board and socket board into tester")
+
             if brd_num == 0:
                 logging.info("Press enter to test GOOD PCBA")
-                input() #Delay starting test sequence until user is ready
-            else:
-                logging.info("PCBA {:d} test".format(brd_num))
 
+            else:
+                logging.info("Press enter to test board {:d}".format(brd_num))
+
+            input() #Delay starting test sequence until user is ready
             err = test_brd()
 
             test_res = f"{tc.green}PASS" if not err else f"{tc.red}FAIL"
