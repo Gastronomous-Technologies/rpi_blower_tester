@@ -46,7 +46,8 @@ def handle_user_prompt(test_def):
     return early_exit
 
 def test_brd():
-    test_index = 0; exit_test = False
+    test_index = 0
+    exit_test = False
 
     pwr_on()
     test_seq = get_test_seq()

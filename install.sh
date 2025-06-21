@@ -1,6 +1,12 @@
 #!/bin/bash
 #Script must be run as root user
 
+if [ $USER != "root" ]; then
+    echo "Script must be run as root user, current user: $USER"
+    echo "Exiting..."
+    exit 1
+fi
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
