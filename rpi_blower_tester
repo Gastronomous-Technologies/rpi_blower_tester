@@ -1,37 +1,52 @@
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=INSTALL_DIR
 
-source $SCRIPT_DIR/../src/*.env
+unset DOCKER_HOST
+docker context use default
 
-while [[ $# -gt 0 ]]; do
-  case $1 in 
-    -b|--build)
-      echo "Building/Rebuilding "$BLOWER_APP_NAME" Version: "$BLOWER_APP_VERSION
-      docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/../src/$BLOWER_PY_APP/
-      shift
-    ;;
-    -h|--help)
-      man $SCRIPT_DIR/../man/man1/$BLOWER_EXEC_FILE.1
-      shift
+GPIO_GID=$(getent group gpio | cut -d: -f3)
+DIALOUT_GID=$(getent group dialout | cut -d: -f3)
+
+. $SCRIPT_DIR/src/*.env
+
+RUN_CMD="docker run --privileged --group-add $GPIO_GID --group-add $DIALOUT_GID \
+             -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
+
+if [ $# -eq 0 ]; then $RUN_CMD
+  
+else
+  for cmd in "$@"
+
+  do
+  
+    case $cmd in 
+
+      -b|--build)
+        echo "Building/Rebuilding "$BLOWER_APP_NAME" Version: "$BLOWER_APP_VERSION
+        docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/src/$BLOWER_PY_APP/
       ;;
-    -r|--run)
-      echo "Running "$BLOWER_APP_NAME
-      docker run --rm -it --device=$(ls /dev/stlinkv2*) $BLOWER_APP_NAME
-      shift
-    ;;
-    -t|--test)
-      echo "Testing "$BLOWER_APP_NAME
-      docker run --rm $BLOWER_APP_NAME python -m pytest -o cache_dir=$WORKSPACE
-      shift
-    ;;
-    -*|--*)
-      printf "Unknown command: "$1"\n"
-      printf "Perhaps see man page or run "$BLOWER_APP_NAME "--help"
-      printf "\nSkipping ...\n"
-      shift
-    ;;
-    *)
-      shift
 
-  esac
+      -h|--help)
+        man $SCRIPT_DIR/../man/man1/$BLOWER_EXEC_FILE.1
+        ;;
 
-done
+      -r|--run)
+        echo "Running "$BLOWER_APP_NAME
+        $RUN_CMD
+      ;;
+
+      -t|--test)
+        echo "Testing "$BLOWER_APP_NAME
+        docker run --rm $BLOWER_APP_NAME python -m pytest -o cache_dir=$WORKSPACE
+       ;;
+
+     -*|--*)
+        printf "Unknown command: "$1"\n"
+        printf "Perhaps see man page or run "$BLOWER_APP_NAME "--help"
+        printf "\nSkipping ...\n"
+      ;;
+
+    esac
+
+  done
+
+fi
