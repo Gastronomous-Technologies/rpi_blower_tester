@@ -1,6 +1,7 @@
 from subprocess import run
 import os
 import argparse
+import logging
 
 from .blower_main import blower_main
 from .config import conf
@@ -12,9 +13,9 @@ description="Testing application for CG5-ELEC-E-019 with tester CG5-TEST-E-019",
 parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
-log_level = conf["log"].DEBUG if args.verbose else conf["log"].INFO
+log_level = logging.DEBUG if args.verbose else logging.INFO
 
-conf["log"].basicConfig(format="%(levelname)s:      %(message)s",
+logging.basicConfig(format="%(levelname)s:      %(message)s",
                     datefmt='%s', level=log_level)
 
 run("cls" if os.name == 'nt' else "clear", shell=True)
