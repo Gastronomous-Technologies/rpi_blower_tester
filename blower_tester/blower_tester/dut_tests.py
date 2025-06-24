@@ -1,4 +1,3 @@
-import logging
 from collections import namedtuple
 import subprocess as sp
 import os
@@ -9,15 +8,15 @@ if act_hw(): from smbus2 import SMBus
 from .stm32 import do_spi_ack, get_tc_temp, set_fan_speed, get_fan_speed
 
 def pwr_on():
-    logging.debug("Asserting power enable pin")
+    conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
 
 def pwr_off():
-    logging.debug("De-Asserting power enable pin")
+    conf["log"].debug("De-Asserting power enable pin")
     pins.pwr_en.value = False
 
 def prog_mcu():
-    logging.info("Programming MCU...")
+    conf["log"].info("Programming MCU...")
 
     bin_dir = "{:s}/lib/{:s}".format(\
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), conf["stm"]["bin_fd"])
@@ -27,27 +26,27 @@ def prog_mcu():
     try:
         cmdline_process = sp.Popen(cmdline_args, stdout=sp.PIPE, stderr=sp.STDOUT)
         process_out, _ = cmdline_process.communicate()
-        logging.debug(process_out.decode("utf-8"))
+        conf["log"].debug(process_out.decode("utf-8"))
 
         if "flash written and verified" in process_out.decode("utf-8").lower():
-            logging.info("Programming sucessful")
+            conf["log"].info("Programming sucessful")
             err = None
         else:
             err = "Failed to program STM32!, check U4, check for shorts on 5V or 3.3V rail"
 
     except(OSError, sp.CalledProcessError) as exception:
-        logging.error("Exception occured: {}".format(exception))
+        conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
 
     return err
 
 def spi_ack():
-    logging.debug("Testing SPI communications to STM")
+    conf["log"].debug("Testing SPI communications to STM")
 
     err = do_spi_ack()
 
-    if err is None: logging.debug("SPI communications check successful")
-    else: logging.error("SPI communications check unsuccessful")
+    if err is None: conf["log"].debug("SPI communications check successful")
+    else: conf["log"].error("SPI communications check unsuccessful")
 
     return err
 
@@ -69,12 +68,12 @@ def test_tc2():
 def _check_tc(tc_num, tc_temp, fail_designators):
     room_temp = _tmp1075_temp()
 
-    logging.debug("Room Temperature: {:.2f} C".format(room_temp))
-    logging.debug("Thermocouple {:d} Temperature: {:.2f} C".format(tc_num, tc_temp))
+    conf["log"].debug("Room Temperature: {:.2f} C".format(room_temp))
+    conf["log"].debug("Thermocouple {:d} Temperature: {:.2f} C".format(tc_num, tc_temp))
 
     if 100 * abs((tc_temp - room_temp) / room_temp) < conf["tc"]["tol"]:
         err = None
-        logging.debug("Thermocouple {:d} test pass".format(tc_num))
+        conf["log"].debug("Thermocouple {:d} test pass".format(tc_num))
 
     else:
         err = "Thermocouple {:d} test failure, check {:s}".format(tc_num, fail_designators)
@@ -84,16 +83,16 @@ def _check_tc(tc_num, tc_temp, fail_designators):
 def _check_fan(fan_num, desired_rpm, fail_designators):
     desired_rpm = int(desired_rpm)
 
-    logging.debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
+    conf["log"].debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
     
     set_fan_speed(fan_num, conf["fan"]["speed"])
     measured_rpm = int(get_fan_speed(fan_num)) 
 
-    logging.debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
+    conf["log"].debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
     if 100 * abs((desired_rpm - measured_rpm) / desired_rpm) < conf["fan"]["tol"]:
         err = None
-        logging.debug("Fan {:d} test pass".format(fan_num))
+        conf["log"].debug("Fan {:d} test pass".format(fan_num))
 
     else:
         err = "Fan {:d} test failure, check {:s}".format(fan_num, fail_designators)

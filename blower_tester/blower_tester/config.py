@@ -1,10 +1,11 @@
-import logging
 import warnings
-from subprocess import check_output
-
 warnings.simplefilter('ignore')
 
+from subprocess import check_output
 from gpiozero import OutputDevice, InputDevice
+import logging
+
+from .config import conf
 
 class text_colour:
     bold = '\033[35m'
@@ -20,9 +21,9 @@ def act_hw():
         if "Raspberry Pi Zero 2 W" in check_output(["cat",
 		"/sys/firmware/devicetree/base/model"]).decode("utf-8"):
             act_hw = True
-            logging.debug("Running on actual hardware")
+            conf["log"].debug("Running on actual hardware")
 
-    except: logging.debug("Not running on actual hardware")
+    except: conf["log"].debug("Not running on actual hardware")
 
     return act_hw
 
@@ -49,5 +50,7 @@ conf = {
     "stm": {
         "bin_fd" : "thermal_monitor.bin",
         "addr"   : "0x8000000" #string type
-    }
+    },
+
+    "log": logging.getLogger(__name__)
 }
