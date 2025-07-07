@@ -7,7 +7,9 @@ name = "blower_tester"
 version = "06.2025"
 
 dependencies = [
-  "pytest"
+  "pytest",
+  "gpiozero",
+  "smbus2"
 ]
 
 requires-python = ">=3.0"

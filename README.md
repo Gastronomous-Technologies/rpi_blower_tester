@@ -8,7 +8,7 @@ This is a software package built in bash and python to program and validate
 The host machine is a Raspberry Pi Zero 2W. Programming of the device under test (DUT) is accomplished using a [STLINKV2](https://www.amazon.ca/CANADUINO-Compatible-Circuit-Programmer-Debugger/dp/B07B2K6ZPK/ref=asc_df_B07B2K6ZPK?mcid=d99c4133b6a134a289509d90224f34ed&tag=googleshopc0c-20&linkCode=df0&hvadid=706724917350&hvpos=&hvnetw=g&hvrand=15777128983881431215&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9192147&hvtargid=pla-836307266791&psc=1&gad_source=1)  programmer in conjunction with the opensource [STlink software](https://github.com/stlink-org/stlink?tab=readme-ov-file). 
 
 ### Working Principle
-A systemd service starts a docker container that launches a python application. The python application will prompt the user to complete some operations and input y/n feedback and then the stlink will program the DUT to complete some tests, check the thermocouples, drive the fans, etc. This isn't yet completed.
+A systemd service starts a docker container that launches a python application. The python application will prompt the user to complete some operations and input y/n feedback and then the stlink will program the DUT to complete some tests, check the thermocouples, drive the fans, etc. 
 
 ### API Information
 After installation run
@@ -21,14 +21,18 @@ man rpi_blower_app
 ```
 
 ### OS Support
-Raspbian, Deb-Based Linux
+Program Installation: Raspbian, Deb-Based Linux \
+Program Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA \
+\
+Python App Installation and Unit Tests: Raspbian, Linux, Windows \
+Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA 
 
 ## Install
 ```sh
-sudo chmod +x install.sh && ./install.sh
+sudo ./install.sh
 ```
 
 ## Uninstall
 ```sh
-./uninstall.sh
+sudo ./uninstall.sh
 ```
