@@ -23,8 +23,8 @@ conf = {
 
     "fan": {
         "range": range(1,4),
-        "speed": 5000, #rpm
-        "tol"  :  10 #%
+        "speed": 7800, #rpm
+        "tol"  :  20 #%
     },
 
     "stm": {
