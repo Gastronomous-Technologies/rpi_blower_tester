@@ -1,18 +1,27 @@
 from collections import namedtuple
+from time import sleep
 import subprocess as sp
 import os
 
 from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
 
-from .stm32 import do_spi_ack, get_tc_temp, set_fan_speed, get_fan_speed
+from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
+
+from .thermal_monitor import ThermalMonitor, TMStatusPacket
+
+__thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
+    sleep(3)
+    __thermal_monitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
+    __thermal_monitor.stop()
+    sleep(3)
     pins.pwr_en.value = False
 
 def prog_mcu():
@@ -43,7 +52,7 @@ def prog_mcu():
 def spi_ack():
     conf["log"].debug("Testing SPI communications to STM")
 
-    err = do_spi_ack()
+    err = do_spi_ack(__thermal_monitor)
 
     if err is None: conf["log"].debug("SPI communications check successful")
     else: conf["log"].error("SPI communications check unsuccessful")
@@ -58,11 +67,11 @@ def _tmp1075_temp():
     return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
 
 def test_tc1():
-    tc1_temp = get_tc_temp(1)
+    tc1_temp = get_tc_temp(__thermal_monitor, 1)
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
 
 def test_tc2():
-    tc2_temp = get_tc_temp(2)
+    tc2_temp = get_tc_temp(__thermal_monitor, 2)
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
 def _check_tc(tc_num, tc_temp, fail_designators):
@@ -85,8 +94,7 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
 
     conf["log"].debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
     
-    set_fan_speed(fan_num, conf["fan"]["speed"])
-    measured_rpm = int(get_fan_speed(fan_num)) 
+    measured_rpm = int(get_fan_speed(__thermal_monitor, fan_num)) 
 
     conf["log"].debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
