@@ -1,18 +1,27 @@
 from collections import namedtuple
+from time import sleep
 import subprocess as sp
 from pathlib import Path
 
 from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
 
-from .stm32 import do_spi_ack, get_tc_temp, set_fan_speed, get_fan_speed
+from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
+
+from .thermal_monitor import ThermalMonitor, TMStatusPacket
+
+__thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
+    sleep(3)
+    __thermal_monitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
+    __thermal_monitor.stop()
+    sleep(0.5)
     pins.pwr_en.value = False
 
 def prog_mcu():
@@ -35,13 +44,13 @@ def prog_mcu():
     except(OSError, sp.CalledProcessError) as exception:
         conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
-
+    sleep(5)
     return err
 
 def spi_ack():
     conf["log"].debug("Testing SPI communications to STM")
 
-    err = do_spi_ack()
+    err = do_spi_ack(__thermal_monitor)
 
     if err is None: conf["log"].debug("SPI communications check successful")
     else: conf["log"].error("SPI communications check unsuccessful")
@@ -56,11 +65,11 @@ def _tmp1075_temp():
     return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
 
 def test_tc1():
-    tc1_temp = get_tc_temp(1)
+    tc1_temp = get_tc_temp(__thermal_monitor, 1)
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
 
 def test_tc2():
-    tc2_temp = get_tc_temp(2)
+    tc2_temp = get_tc_temp(__thermal_monitor, 2)
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
 def _check_tc(tc_num, tc_temp, fail_designators):
@@ -81,14 +90,15 @@ def _check_tc(tc_num, tc_temp, fail_designators):
 def _check_fan(fan_num, desired_rpm, fail_designators):
     desired_rpm = int(desired_rpm)
 
-    conf["log"].debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
-
-    set_fan_speed(fan_num, conf["fan"]["speed"])
-    measured_rpm = int(get_fan_speed(fan_num)) 
+    conf["log"].debug("Attempting to spin fan {:d} at {:d} RPM".format(fan_num, desired_rpm))
+    
+    measured_rpm = int(get_fan_speed(__thermal_monitor, fan_num)) 
 
     conf["log"].debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
-    if 100 * abs((desired_rpm - measured_rpm) / desired_rpm) < conf["fan"]["tol"]:
+    percent_error = 100 * abs((desired_rpm - measured_rpm) / desired_rpm) 
+    conf["log"].debug(f'Fan % error: {percent_error}')
+    if percent_error < conf["fan"]["tol"]:
         err = None
         conf["log"].debug("Fan {:d} test pass".format(fan_num))
 
@@ -98,13 +108,13 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
     return err
 
 def test_fan1():
-    return _check_fan(1, conf["fan"]["speed"], "R18, R19, R25, C12, D4, Q1")
+    return _check_fan(1, conf["fan"]["speed"][0], "R18, R19, R25, C12, D4, Q1")
 
 def test_fan2():
-    return _check_fan(2, conf["fan"]["speed"], "R20, R21, R26, C13, D5, Q2")
+    return _check_fan(2, conf["fan"]["speed"][1], "R20, R21, R26, C13, D5, Q2")
 
 def test_fan3():
-    return _check_fan(3, conf["fan"]["speed"], "R22, R23, R29, C14, D6, Q3")
+    return _check_fan(3, conf["fan"]["speed"][2], "R22, R23, R29, C14, D6, Q3")
 
 def get_test_seq():
     dut_test = namedtuple("dut_test", ["name", "func", "prompt", "debug_prompt"])
