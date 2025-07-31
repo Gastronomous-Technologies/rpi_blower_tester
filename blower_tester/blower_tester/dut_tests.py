@@ -1,6 +1,6 @@
 from collections import namedtuple
 import subprocess as sp
-import os
+from pathlib import Path
 
 from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
@@ -18,9 +18,7 @@ def pwr_off():
 def prog_mcu():
     conf["log"].info("Programming MCU...")
 
-    bin_dir = "{:s}/lib/{:s}".format(\
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), conf["stm"]["bin_fd"])
-
+    bin_dir = "{}/lib/{:s}".format(Path(__file__).resolve().parent, conf["stm"]["bin_fd"])
     cmdline_args = ["st-flash", "--freq=4M", "--reset", "write", bin_dir, conf["stm"]["addr"]]
 
     try:
@@ -84,7 +82,7 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
     desired_rpm = int(desired_rpm)
 
     conf["log"].debug("Attempting to spin fan {:d} at {:d} rpm".format(fan_num, desired_rpm))
-    
+
     set_fan_speed(fan_num, conf["fan"]["speed"])
     measured_rpm = int(get_fan_speed(fan_num)) 
 
