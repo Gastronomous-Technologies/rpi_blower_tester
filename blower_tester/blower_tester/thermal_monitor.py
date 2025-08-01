@@ -1,4 +1,4 @@
-from .config import act_hw
+from .config import conf, act_hw
 if act_hw(): import spidev
 import struct
 
@@ -34,15 +34,16 @@ class TMStatusPacket:
         """
 
 class ThermalMonitor:
-    def __init__(self, bus_id, device_id, clock_speed, spi_mode):
-        ThermalMonitor.bus_id = bus_id
-        ThermalMonitor.device_id = device_id
-        ThermalMonitor.clock_speed = clock_speed
-        ThermalMonitor.spi_mode = spi_mode
+    def __init__():
+        ThermalMonitor.bus_id = conf["bus_id"]
+        ThermalMonitor.device_id = conf["device_id"]
+        ThermalMonitor.clock_speed = conf["clock_speed"]
+        ThermalMonitor.spi_mode = conf["spi_mode"]
         ThermalMonitor.spi_inst = spidev.SpiDev()
         ThermalMonitor.packet = TMStatusPacket()
 
     def start():
+        ThermalMonitor.packet = TMStatusPacket()
         ThermalMonitor.spi_inst.open(ThermalMonitor.bus_id, ThermalMonitor.device_id)
         ThermalMonitor.spi_inst.max_speed_hz = ThermalMonitor.clock_speed
         ThermalMonitor.spi_inst.mode = ThermalMonitor.spi_mode
