@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 from .config import conf, act_hw
 if act_hw(): import spidev
-=======
-import spidev
->>>>>>> sm/ES-1441/thermal-monitor-test-impl
 import struct
 
 class TMStatusPacket:
@@ -38,7 +34,6 @@ class TMStatusPacket:
         """
 
 class ThermalMonitor:
-<<<<<<< HEAD
     def __init__():
         ThermalMonitor.bus_id = conf["bus_id"]
         ThermalMonitor.device_id = conf["device_id"]
@@ -58,26 +53,6 @@ class ThermalMonitor:
         packet_started = False
         while not packet_started and fail_count < TMStatusPacket.PACKET_SIZE:
             recv = ThermalMonitor.spi_inst.xfer([0], ThermalMonitor.clock_speed, 1, 8)
-=======
-    def __init__(self, bus_id, device_id, clock_speed, spi_mode):
-        self.bus_id = bus_id
-        self.device_id = device_id
-        self.clock_speed = clock_speed
-        self.spi_mode = spi_mode
-        self.spi_inst = spidev.SpiDev()
-        self.packet = TMStatusPacket()
-
-    def start(self):
-        self.spi_inst.open(self.bus_id, self.device_id)
-        self.spi_inst.max_speed_hz = self.clock_speed
-        self.spi_inst.mode = self.spi_mode
-
-    def request_packet(self):
-        fail_count = 0
-        packet_started = False
-        while not packet_started and fail_count < TMStatusPacket.PACKET_SIZE:
-            recv = self.spi_inst.xfer([0], self.clock_speed, 1, 8)
->>>>>>> sm/ES-1441/thermal-monitor-test-impl
             packet_started = recv[0] == TMStatusPacket.PACKET_SOF
             if not packet_started:
                 fail_count = fail_count + 1
@@ -85,18 +60,9 @@ class ThermalMonitor:
             fail_count = 0
         else:
             payload = [0] * (TMStatusPacket.PACKET_SIZE-1)
-<<<<<<< HEAD
             recv = ThermalMonitor.spi_inst.xfer(payload, ThermalMonitor.clock_speed, 1, 8)
 
         ThermalMonitor.packet.load_from_buff(recv)
 
     def stop():
         ThermalMonitor.spi_inst.close()
-=======
-            recv = self.spi_inst.xfer(payload, self.clock_speed, 1, 8)
-
-        self.packet.load_from_buff(recv)
-
-    def stop(self):
-        self.spi_inst.close()
->>>>>>> sm/ES-1441/thermal-monitor-test-impl
