@@ -1,4 +1,5 @@
-import spidev
+from .config import act_hw
+if act_hw(): import spidev
 import struct
 
 class TMStatusPacket:
@@ -34,23 +35,23 @@ class TMStatusPacket:
 
 class ThermalMonitor:
     def __init__(self, bus_id, device_id, clock_speed, spi_mode):
-        self.bus_id = bus_id
-        self.device_id = device_id
-        self.clock_speed = clock_speed
-        self.spi_mode = spi_mode
-        self.spi_inst = spidev.SpiDev()
-        self.packet = TMStatusPacket()
+        ThermalMonitor.bus_id = bus_id
+        ThermalMonitor.device_id = device_id
+        ThermalMonitor.clock_speed = clock_speed
+        ThermalMonitor.spi_mode = spi_mode
+        ThermalMonitor.spi_inst = spidev.SpiDev()
+        ThermalMonitor.packet = TMStatusPacket()
 
-    def start(self):
-        self.spi_inst.open(self.bus_id, self.device_id)
-        self.spi_inst.max_speed_hz = self.clock_speed
-        self.spi_inst.mode = self.spi_mode
+    def start():
+        ThermalMonitor.spi_inst.open(ThermalMonitor.bus_id, ThermalMonitor.device_id)
+        ThermalMonitor.spi_inst.max_speed_hz = ThermalMonitor.clock_speed
+        ThermalMonitor.spi_inst.mode = ThermalMonitor.spi_mode
 
-    def request_packet(self):
+    def request_packet():
         fail_count = 0
         packet_started = False
         while not packet_started and fail_count < TMStatusPacket.PACKET_SIZE:
-            recv = self.spi_inst.xfer([0], self.clock_speed, 1, 8)
+            recv = ThermalMonitor.spi_inst.xfer([0], ThermalMonitor.clock_speed, 1, 8)
             packet_started = recv[0] == TMStatusPacket.PACKET_SOF
             if not packet_started:
                 fail_count = fail_count + 1
@@ -58,9 +59,9 @@ class ThermalMonitor:
             fail_count = 0
         else:
             payload = [0] * (TMStatusPacket.PACKET_SIZE-1)
-            recv = self.spi_inst.xfer(payload, self.clock_speed, 1, 8)
+            recv = ThermalMonitor.spi_inst.xfer(payload, ThermalMonitor.clock_speed, 1, 8)
 
-        self.packet.load_from_buff(recv)
+        ThermalMonitor.packet.load_from_buff(recv)
 
-    def stop(self):
-        self.spi_inst.close()
+    def stop():
+        ThermalMonitor.spi_inst.close()
