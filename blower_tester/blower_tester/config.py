@@ -23,7 +23,7 @@ conf = {
 
     "fan": {
         "range": range(1,4),
-        "speed": 7800, #rpm
+        "speed": [7800, 16000, 7800], #rpm
         "tol"  :  20 #%
     },
 
@@ -34,8 +34,8 @@ conf = {
 
     "tm": {
         "bus_id":      0,
-        "device_id":   0, 
-        "clock_speed": 50000, 
+        "device_id":   0,
+        "clock_speed": 50000,
         "spi_mode":    0
     },
 

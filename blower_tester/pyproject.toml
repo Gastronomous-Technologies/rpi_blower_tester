@@ -10,7 +10,11 @@ dependencies = [
   "pytest",
   "gpiozero",
   "smbus2",
+<<<<<<< HEAD
   "spidev; platform_system == 'Linux'"
+=======
+  "spidev"
+>>>>>>> sm/ES-1441/thermal-monitor-test-impl
 ]
 
 requires-python = ">=3.0"
