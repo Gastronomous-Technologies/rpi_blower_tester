@@ -10,6 +10,7 @@ dependencies = [
   "pytest",
   "gpiozero",
   "smbus2",
+  "spidev; platform_system == 'Linux'"
 ]
 
 requires-python = ">=3.0"
