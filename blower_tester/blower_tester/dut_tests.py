@@ -9,13 +9,11 @@ if act_hw(): from smbus2 import SMBus
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
 from .thermal_monitor import ThermalMonitor 
 
-__thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
-
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
     sleep(3)
-    __thermal_monitor.start()
+    ThermalMonitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
@@ -49,7 +47,7 @@ def prog_mcu():
 def spi_ack():
     conf["log"].debug("Testing SPI communications to STM")
 
-    err = do_spi_ack(__thermal_monitor)
+    err = do_spi_ack()
 
     if err is None: conf["log"].debug("SPI communications check successful")
     else: conf["log"].error("SPI communications check unsuccessful")
@@ -64,11 +62,11 @@ def _tmp1075_temp():
     return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
 
 def test_tc1():
-    tc1_temp = get_tc_temp(__thermal_monitor, 1)
+    tc1_temp = get_tc_temp(1)
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
 
 def test_tc2():
-    tc2_temp = get_tc_temp(__thermal_monitor, 2)
+    tc2_temp = get_tc_temp(2)
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
 def _check_tc(tc_num, tc_temp, fail_designators):

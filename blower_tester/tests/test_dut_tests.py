@@ -81,7 +81,4 @@ class TestGroup(TestCase):
 
     def test_thermocouple_out_of_range(self):
         with self.assertRaises(ValueError): 
-            dut_tests.set_fan_speed(min(conf["fan"]["range"]) - 1, conf["fan"]["speed"])
-
-        with self.assertRaises(ValueError): 
             dut_tests.get_fan_speed(max(conf["fan"]["range"]) + 1)

@@ -32,6 +32,13 @@ conf = {
         "addr"   : "0x8000000" #string type
     },
 
+    "tm": {
+        "bus_id":      0,
+        "device_id":   0, 
+        "clock_speed": 50000, 
+        "spi_mode":    0
+    },
+
     "log": logging.getLogger(__name__)
 }
 
