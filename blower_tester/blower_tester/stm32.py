@@ -39,14 +39,13 @@ def get_fan_speed(thermal_monitor, fan_num):
         raise ValueError
     else:
         TIMEOUT_S = 10
-        packet = TMStatusPacket() 
         start = time()
-        while not (__fan_speed_valid(packet, fan_num-1) or (time() - start) > TIMEOUT_S):
-            thermal_monitor.request_packet()
-            packet = thermal_monitor.packet
+        while not (__fan_speed_valid( fan_num-1) or (time() - start) > TIMEOUT_S):
+            ThermalMonitor.request_packet()
+            packet = ThermalMonitor.packet
             if __fan_speed_valid(packet, fan_num-1):
-                conf["log"].debug(f"Packet Received: \n{thermal_monitor.packet}")
-                fan_speed = thermal_monitor.packet.fan_speed_rpm[fan_num-1]
+                conf["log"].debug(f"Packet Received: \n{ThermalMonitor.packet}")
+                fan_speed = ThermalMonitor.packet.fan_speed_rpm[fan_num-1]
                 break
     conf["log"].debug("Measured fan {:d}, speed: {:d} RPM".format(fan_num, fan_speed))
     return fan_speed

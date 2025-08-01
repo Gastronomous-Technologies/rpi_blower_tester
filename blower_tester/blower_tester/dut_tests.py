@@ -1,5 +1,5 @@
 from collections import namedtuple
-from time import sleep
+import time
 import subprocess as sp
 from pathlib import Path
 
@@ -41,7 +41,7 @@ def prog_mcu():
     except(OSError, sp.CalledProcessError) as exception:
         conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
-    sleep(5)
+    time.sleep(5)
     return err
 
 def spi_ack():
