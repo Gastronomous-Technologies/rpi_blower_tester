@@ -7,8 +7,7 @@ from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
 
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
-
-from .thermal_monitor import ThermalMonitor, TMStatusPacket
+from .thermal_monitor import ThermalMonitor 
 
 __thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
 

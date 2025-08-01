@@ -69,15 +69,13 @@ class TestGroup(TestCase):
             dut_tests.get_tc_temp(max(conf["tc"]["range"]) + 1)
 
     @patch('blower_tester.dut_tests.get_fan_speed', return_value=conf["fan"]["speed"])
-    @patch('blower_tester.dut_tests.set_fan_speed')
-    def test_fan_pass(self, mock_sfs, mock_gfs):
+    def test_fan_pass(self, mock_gfs):
         err = dut_tests._check_fan(1, conf["fan"]["speed"], 'a,b,c')
         assert err == None
     
     @patch('blower_tester.dut_tests.get_fan_speed', 
                 return_value=(1 - 2 * conf["fan"]["tol"] / 100) * conf["fan"]["speed"])
-    @patch('blower_tester.dut_tests.set_fan_speed')
-    def test_fan_fail(self, mock_sfs, mock_gfs):
+    def test_fan_fail(self, mock_gfs):
         err = dut_tests._check_fan(1, conf["fan"]["speed"], 'a,b,c')
         assert err
 

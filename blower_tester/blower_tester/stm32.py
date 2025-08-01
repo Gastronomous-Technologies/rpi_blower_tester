@@ -1,5 +1,5 @@
 from .config import conf
-from .thermal_monitor import ThermalMonitor, TMStatusPacket
+from .thermal_monitor import ThermalMonitor 
 from time import time
 
 def __fw_version_valid(packet):
@@ -18,8 +18,7 @@ def do_spi_ack(thermal_monitor):
     conf["log"].debug(f"Packet Received: \n{thermal_monitor.packet}")
     return "Could not communicate over SPI"
 
-
-def get_tc_temp(thermal_monitor, tc_ch):
+def get_tc_temp(tc_ch):
     if tc_ch not in conf["tc"]["range"]:
         conf["log"].exception("Error, desired thermocouple number must be 1 or 2")
         raise ValueError
