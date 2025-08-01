@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blower_tester"
-version = "06.2025"
+version = "08.2025"
 
 dependencies = [
   "pytest",
