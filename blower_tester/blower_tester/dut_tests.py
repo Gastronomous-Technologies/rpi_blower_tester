@@ -1,5 +1,5 @@
 from collections import namedtuple
-from time import sleep
+import time
 import subprocess as sp
 from pathlib import Path
 
@@ -7,21 +7,18 @@ from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
 
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
-
-from .thermal_monitor import ThermalMonitor, TMStatusPacket
-
-__thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
+from .thermal_monitor import ThermalMonitor 
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
-    sleep(3)
-    __thermal_monitor.start()
+    time.sleep(3)
+    ThermalMonitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
-    __thermal_monitor.stop()
-    sleep(0.5)
+    ThermalMonitor.stop()
+    time.sleep(0.5)
     pins.pwr_en.value = False
 
 def prog_mcu():
@@ -44,13 +41,13 @@ def prog_mcu():
     except(OSError, sp.CalledProcessError) as exception:
         conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
-    sleep(5)
+    time.sleep(5)
     return err
 
 def spi_ack():
     conf["log"].debug("Testing SPI communications to STM")
 
-    err = do_spi_ack(__thermal_monitor)
+    err = do_spi_ack()
 
     if err is None: conf["log"].debug("SPI communications check successful")
     else: conf["log"].error("SPI communications check unsuccessful")
@@ -65,11 +62,11 @@ def _tmp1075_temp():
     return ((raw[0] << 4) + (raw[1] >> 4)) * 0.0625
 
 def test_tc1():
-    tc1_temp = get_tc_temp(__thermal_monitor, 1)
+    tc1_temp = get_tc_temp(1)
     return _check_tc(1, tc1_temp, "U1, L1, L2, R4, R6, R7, C1, CN3")
 
 def test_tc2():
-    tc2_temp = get_tc_temp(__thermal_monitor, 2)
+    tc2_temp = get_tc_temp(2)
     return _check_tc(2, tc2_temp, "U2, L3, L4, R11, R13, R14, C3, CN4")
 
 def _check_tc(tc_num, tc_temp, fail_designators):
@@ -90,9 +87,8 @@ def _check_tc(tc_num, tc_temp, fail_designators):
 def _check_fan(fan_num, desired_rpm, fail_designators):
     desired_rpm = int(desired_rpm)
 
-    conf["log"].debug("Attempting to spin fan {:d} at {:d} RPM".format(fan_num, desired_rpm))
-    
-    measured_rpm = int(get_fan_speed(__thermal_monitor, fan_num)) 
+    conf["log"].debug("Fan {:d} should spin at {:d} rpm".format(fan_num, desired_rpm))
+    measured_rpm = int(get_fan_speed(fan_num)) 
 
     conf["log"].debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
 
