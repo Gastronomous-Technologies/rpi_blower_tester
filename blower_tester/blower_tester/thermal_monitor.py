@@ -41,7 +41,6 @@ class ThermalMonitor:
         ThermalMonitor.clock_speed = conf["tm"]["clock_speed"]
         ThermalMonitor.spi_mode = conf["tm"]["spi_mode"]
         ThermalMonitor.spi_inst = spidev.SpiDev()
-        ThermalMonitor.packet = TMStatusPacket()
 
         ThermalMonitor.packet = TMStatusPacket()
         ThermalMonitor.spi_inst.open(ThermalMonitor.bus_id, ThermalMonitor.device_id)
