@@ -6,7 +6,7 @@ def __fw_version_valid(__thermal_monitor):
 def do_spi_ack(__thermal_monitor):
     __thermal_monitor.request_packet()
     conf["log"].debug(f"Packet Received: \n{__thermal_monitor.packet}")
-    return None if __fw_version_valid() else "Could not communicate over SPI"
+    return None if __fw_version_valid(__thermal_monitor) else "Could not communicate over SPI"
 
 def get_tc_temp(__thermal_monitor, tc_ch):
     if tc_ch not in conf["tc"]["range"]:
