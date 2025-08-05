@@ -7,8 +7,9 @@ from blower_tester.config import conf
 class TestGroup(TestCase):
     room_temp = 25
 
+    @patch('time.sleep', return_value=None)
     @patch('subprocess.Popen')
-    def test_prog_mcu_pass(self, mock_popen):
+    def test_prog_mcu_pass(self, mock_popen, mock_sleep):
 
         process_mock = Mock()
         attrs = {"communicate.return_value": 
@@ -21,8 +22,9 @@ class TestGroup(TestCase):
         err = dut_tests.prog_mcu()
         assert err == None
 
+    @patch('time.sleep', return_value=None)
     @patch('subprocess.Popen')
-    def test_prog_mcu_fail(self, mock_popen):
+    def test_prog_mcu_fail(self, mock_popen, mock_sleep):
 
         process_mock = Mock()
         attrs = {"communicate.return_value": 
@@ -35,7 +37,8 @@ class TestGroup(TestCase):
         err = dut_tests.prog_mcu()
         assert err
 
-    def test_prog_mcu_error(self):
+    @patch('time.sleep', return_value=None)
+    def test_prog_mcu_error(self, mock_sleep):
         err = dut_tests.prog_mcu()
         assert err
 
@@ -63,27 +66,25 @@ class TestGroup(TestCase):
     @patch('blower_tester.dut_tests._tmp1075_temp', return_value=room_temp)
     def test_thermocouple_out_of_range(self, mock_tmp_temp):
         with self.assertRaises(ValueError): 
-            dut_tests.get_tc_temp(min(conf["tc"]["range"]) - 1)
+            dut_tests.get_tc_temp(None, min(conf["tc"]["range"]) - 1)
 
         with self.assertRaises(ValueError): 
-            dut_tests.get_tc_temp(max(conf["tc"]["range"]) + 1)
+            dut_tests.get_tc_temp(None, max(conf["tc"]["range"]) + 1)
 
-    @patch('blower_tester.dut_tests.get_fan_speed', return_value=conf["fan"]["speed"])
-    @patch('blower_tester.dut_tests.set_fan_speed')
-    def test_fan_pass(self, mock_sfs, mock_gfs):
-        err = dut_tests._check_fan(1, conf["fan"]["speed"], 'a,b,c')
+    @patch('blower_tester.dut_tests.get_fan_speed', return_value=conf["fan"]["speed"][1])
+    def test_fan_pass(self, mock_gfs):
+        err = dut_tests._check_fan(1, conf["fan"]["speed"][1], 'a,b,c')
         assert err == None
     
     @patch('blower_tester.dut_tests.get_fan_speed', 
-                return_value=(1 - 2 * conf["fan"]["tol"] / 100) * conf["fan"]["speed"])
-    @patch('blower_tester.dut_tests.set_fan_speed')
-    def test_fan_fail(self, mock_sfs, mock_gfs):
-        err = dut_tests._check_fan(1, conf["fan"]["speed"], 'a,b,c')
+                return_value=(1 - 2 * conf["fan"]["tol"] / 100) * conf["fan"]["speed"][1])
+    def test_fan_fail(self, mock_gfs):
+        err = dut_tests._check_fan(1, conf["fan"]["speed"][1], 'a,b,c')
         assert err
 
-    def test_thermocouple_out_of_range(self):
+    def test_fan_out_of_range(self):
         with self.assertRaises(ValueError): 
-            dut_tests.set_fan_speed(min(conf["fan"]["range"]) - 1, conf["fan"]["speed"])
+            dut_tests.get_fan_speed(None, min(conf["fan"]["range"]) - 1)
 
         with self.assertRaises(ValueError): 
-            dut_tests.get_fan_speed(max(conf["fan"]["range"]) + 1)
+            dut_tests.get_fan_speed(None, max(conf["fan"]["range"]) + 1)

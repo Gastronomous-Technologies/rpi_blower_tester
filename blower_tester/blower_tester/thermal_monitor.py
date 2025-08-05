@@ -1,4 +1,6 @@
-import spidev
+from .config import act_hw
+if act_hw(): import spidev
+
 import struct
 
 class TMStatusPacket:
@@ -64,3 +66,12 @@ class ThermalMonitor:
 
     def stop(self):
         self.spi_inst.close()
+
+class MockThermalMonitor(ThermalMonitor):
+    def __init__(self, bus_id, device_id, clock_speed, spi_mode):
+        self.bus_id = bus_id
+        self.device_id = device_id
+        self.clock_speed = clock_speed
+        self.spi_mode = spi_mode
+        self.spi_inst = None
+        self.packet = TMStatusPacket()

@@ -1,27 +1,29 @@
 from collections import namedtuple
-from time import sleep
+import time
 import subprocess as sp
 from pathlib import Path
 
 from .config import pins, conf, act_hw
-if act_hw(): from smbus2 import SMBus
+from .thermal_monitor import ThermalMonitor, MockThermalMonitor
+
+if act_hw(): 
+    from smbus2 import SMBus
+    __thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
+else: 
+    __thermal_monitor = MockThermalMonitor(0, 0, 50000, 0)
 
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
-
-from .thermal_monitor import ThermalMonitor, TMStatusPacket
-
-__thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
-    sleep(3)
+    time.sleep(3)
     __thermal_monitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
     __thermal_monitor.stop()
-    sleep(0.5)
+    time.sleep(0.5)
     pins.pwr_en.value = False
 
 def prog_mcu():
@@ -44,7 +46,7 @@ def prog_mcu():
     except(OSError, sp.CalledProcessError) as exception:
         conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
-    sleep(5)
+    time.sleep(5)
     return err
 
 def spi_ack():
