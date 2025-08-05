@@ -4,20 +4,25 @@ import subprocess as sp
 from pathlib import Path
 
 from .config import pins, conf, act_hw
-if act_hw(): from smbus2 import SMBus
+from .thermal_monitor import ThermalMonitor, MockThermalMonitor
+
+if act_hw(): 
+    from smbus2 import SMBus
+    __thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
+else: 
+    __thermal_monitor = MockThermalMonitor(0, 0, 50000, 0)
 
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
-from .thermal_monitor import ThermalMonitor 
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
     time.sleep(3)
-    ThermalMonitor.start()
+    __thermal_monitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
-    ThermalMonitor.stop()
+    __thermal_monitor.stop()
     time.sleep(0.5)
     pins.pwr_en.value = False
 
