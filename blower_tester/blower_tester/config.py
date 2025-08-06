@@ -34,8 +34,8 @@ conf = {
 
     "tm": {
         "bus_id":      0,
-        "device_id":   0, 
-        "clock_speed": 50000, 
+        "device_id":   0,
+        "clock_speed": 50000,
         "spi_mode":    0
     },
 

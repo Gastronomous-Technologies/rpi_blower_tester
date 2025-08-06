@@ -66,10 +66,10 @@ class TestGroup(TestCase):
     @patch('blower_tester.dut_tests._tmp1075_temp', return_value=room_temp)
     def test_thermocouple_out_of_range(self, mock_tmp_temp):
         with self.assertRaises(ValueError): 
-            dut_tests.get_tc_temp(min(conf["tc"]["range"]) - 1)
+            dut_tests.get_tc_temp(None, min(conf["tc"]["range"]) - 1)
 
         with self.assertRaises(ValueError): 
-            dut_tests.get_tc_temp(max(conf["tc"]["range"]) + 1)
+            dut_tests.get_tc_temp(None, max(conf["tc"]["range"]) + 1)
 
     @patch('blower_tester.dut_tests.get_fan_speed', return_value=conf["fan"]["speed"][1])
     def test_fan_pass(self, mock_gfs):
@@ -82,6 +82,9 @@ class TestGroup(TestCase):
         err = dut_tests._check_fan(1, conf["fan"]["speed"][1], 'a,b,c')
         assert err
 
-    def test_thermocouple_out_of_range(self):
+    def test_fan_out_of_range(self):
         with self.assertRaises(ValueError): 
-            dut_tests.get_fan_speed(max(conf["fan"]["range"]) + 1)
+            dut_tests.get_fan_speed(None, min(conf["fan"]["range"]) - 1)
+
+        with self.assertRaises(ValueError): 
+            dut_tests.get_fan_speed(None, max(conf["fan"]["range"]) + 1)
