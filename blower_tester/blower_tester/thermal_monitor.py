@@ -1,4 +1,5 @@
-import spidev
+from .config import act_hw
+if act_hw(): import spidev
 import struct
 
 class TMStatusPacket:
@@ -38,7 +39,7 @@ class ThermalMonitor:
         self.device_id = device_id
         self.clock_speed = clock_speed
         self.spi_mode = spi_mode
-        self.spi_inst = spidev.SpiDev()
+        self.spi_inst = spidev.SpiDev() if act_hw() else None
         self.packet = TMStatusPacket()
 
     def start(self):
