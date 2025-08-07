@@ -1,27 +1,26 @@
 from collections import namedtuple
-from time import sleep
+import time
 import subprocess as sp
 from pathlib import Path
 
+from .thermal_monitor import ThermalMonitor 
 from .config import pins, conf, act_hw
 if act_hw(): from smbus2 import SMBus
 
 from .stm32 import do_spi_ack, get_tc_temp, get_fan_speed
-
-from .thermal_monitor import ThermalMonitor, TMStatusPacket
 
 __thermal_monitor = ThermalMonitor(0, 0, 50000, 0)
 
 def pwr_on():
     conf["log"].debug("Asserting power enable pin")
     pins.pwr_en.value = True
-    sleep(3)
+    time.sleep(3)
     __thermal_monitor.start()
 
 def pwr_off():
     conf["log"].debug("De-Asserting power enable pin")
     __thermal_monitor.stop()
-    sleep(0.5)
+    time.sleep(0.5)
     pins.pwr_en.value = False
 
 def prog_mcu():
@@ -44,7 +43,7 @@ def prog_mcu():
     except(OSError, sp.CalledProcessError) as exception:
         conf["log"].error("Exception occured: {}".format(exception))
         err = "An error occurred, cannot program STM32!, check U4"
-    sleep(5)
+    time.sleep(5)
     return err
 
 def spi_ack():
@@ -91,7 +90,7 @@ def _check_fan(fan_num, desired_rpm, fail_designators):
     desired_rpm = int(desired_rpm)
 
     conf["log"].debug("Attempting to spin fan {:d} at {:d} RPM".format(fan_num, desired_rpm))
-    
+
     measured_rpm = int(get_fan_speed(__thermal_monitor, fan_num)) 
 
     conf["log"].debug("Measured fan {:d} RPM: {:d}".format(fan_num, measured_rpm))
