@@ -36,15 +36,17 @@ Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA
 5. Write the image to the card \
    <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/a348bae7-b2cb-4fbd-b59b-b07764554d9f" />
 6. Plug card into RPI Zero 2 W on CG5-TEST-E-019 then connect HDMI to a monitor and plug in power cable
-7. Copy over the zip or tar of the release to the device. Do not clone repositories if sending device externally \
+7. After the RPI Zero 2 W boots and resizes the file system (this may take a few minutes) log in as a non-root user
+8. Copy over the zip or tar of the release to the device. Do not clone repositories on the disk if sending the device externally \
    Hint: if using a flash drive you need to mount the drive.
    ```
    mkdir ~/usb
-   sudo fdisk -l #find the drive name, ex: /dev/sda1
-   sudo mount /dev/sda1 ~/usb
+   lsblk #find the USB's partition name, ex: /dev/sda1
+   sudo mount <partition name> ~/usb
    cp ~/usb/rpi* ~
    sudo umount -l ~/usb #Now safe to remove drive
-   sudo chown $USER -R ~/rpi* && sudo chgrp $USER -R ~/rpi*
+   sudo chown $USER -R ~/rpi_blower_tester* && sudo chgrp $USER -R ~/rpi_blower_tester*
+   unzip rpi_blower_tester* #then cd into directory
    ```
 8. Install the program as shown below 
 
