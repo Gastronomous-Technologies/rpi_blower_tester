@@ -27,6 +27,8 @@ def get_tc_temp(thermal_monitor, tc_ch):
         for i in range(5):
             thermal_monitor.request_packet()
             conf["log"].debug(f"Packet Received: \n{thermal_monitor.packet}")
+        if not thermal_monitor.has_valid_packet():
+            conf["log"].exception("Error, failed to recieve valid packet over SPI")
         tc_temp = thermal_monitor.packet.temp_sensor_C[tc_ch-1]
     return tc_temp
 
@@ -49,6 +51,8 @@ def get_fan_speed(thermal_monitor, fan_num):
                 conf["log"].debug(f"Packet Received: \n{thermal_monitor.packet}")
                 fan_speed = thermal_monitor.packet.fan_speed_rpm[fan_num-1]
                 break
+        if not thermal_monitor.has_valid_packet():
+                conf["log"].exception("Error, failed to recieve valid packet over SPI")
 
     conf["log"].debug("Measured fan {:d}, speed: {:d} RPM".format(fan_num, fan_speed))
     return fan_speed

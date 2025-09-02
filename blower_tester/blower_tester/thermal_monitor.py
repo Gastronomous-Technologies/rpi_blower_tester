@@ -1,4 +1,4 @@
-from .config import act_hw
+from .config import act_hw, conf
 if act_hw(): import spidev
 import struct
 
@@ -15,14 +15,24 @@ class TMStatusPacket:
         self.error_flags = 0
 
     def load_from_buff(self, buff):
-        unpacked_data = struct.unpack('<BBBffffHHHI', bytes(buff))
-        self.fw_version_major = unpacked_data[0]
-        self.fw_version_minor = unpacked_data[1]
-        self.fw_version_patch = unpacked_data[2]
-        self.temp_sensor_C = unpacked_data[3:5]
-        self.temp_board_C = unpacked_data[5:7]
-        self.fan_speed_rpm = unpacked_data[7:10]
-        self.error_flags = unpacked_data[10]
+        try:
+            unpacked_data = struct.unpack('<BBBffffHHHI', bytes(buff))
+            self.fw_version_major = unpacked_data[0]
+            self.fw_version_minor = unpacked_data[1]
+            self.fw_version_patch = unpacked_data[2]
+            self.temp_sensor_C = unpacked_data[3:5]
+            self.temp_board_C = unpacked_data[5:7]
+            self.fan_speed_rpm = unpacked_data[7:10]
+            self.error_flags = unpacked_data[10]
+        except struct.error as e:
+            self.fw_version_major = 0
+            self.fw_version_minor = 0
+            self.fw_version_patch = 0
+            self.temp_sensor_C = [0.,0.]
+            self.temp_board_C = [0.,0.]
+            self.fan_speed_rpm = [0, 0, 0]
+            self.error_flags = 0
+            conf['log'].debug(f'Error deserializing packet: {e}')
 
     def __str__(self):
         return f"""
@@ -65,3 +75,6 @@ class ThermalMonitor:
 
     def stop(self):
         self.spi_inst.close()
+
+    def has_valid_packet(self):
+        return self.packet.fw_version_major + self.packet.fw_version_minor + self.packet.fw_version_patch
