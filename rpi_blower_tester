@@ -5,11 +5,15 @@ docker context use default
 
 GPIO_GID=$(getent group gpio | cut -d: -f3)
 DIALOUT_GID=$(getent group dialout | cut -d: -f3)
+I2C_GID=$(getent group i2c | cut -d: -f3)
+SPI_GID=$(getent group spi | cut -d: -f3)
 
 . $SCRIPT_DIR/src/*.env
 
-RUN_CMD="docker run --privileged --group-add $GPIO_GID --group-add $DIALOUT_GID \
-             -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
+RUN_CMD="docker run --privileged \
+         --group-add $GPIO_GID --group-add $DIALOUT_GID \
+         --group-add $I2C_GID  --group-add $SPI_GID \
+         -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
 
 if [ $# -eq 0 ]; then $RUN_CMD
   

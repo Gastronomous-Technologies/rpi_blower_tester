@@ -21,15 +21,39 @@ man rpi_blower_app
 ```
 
 ### OS Support
-Program Installation: Raspbian, Deb-Based Linux \
+Program Installation: 64 bit Raspberry Pi OS Lite (64-bit), Deb-Based Linux \
 Program Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA \
 \
 Python App Installation and Unit Tests: Raspbian, Linux, Windows \
 Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA 
 
+## Deployment Instructions
+1. Download and install [rpi-imager](https://www.raspberrypi.com/software/)
+2. Use rpi-imager with a fresh SD card 16 GB or larger and format with Raspberry Pi OS Lite (64-bit) \
+   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/386b40bd-7f5b-4315-a732-86e005b8f8eb" />
+3. Apply custom OS settings so that the card automatically connects to Wi-Fi \
+   <img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/446f8cb3-eb5c-4aa8-87de-d2846b9a80df" />
+5. Write the image to the card \
+   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/a348bae7-b2cb-4fbd-b59b-b07764554d9f" />
+6. Plug card into RPI Zero 2 W on CG5-TEST-E-019 then connect HDMI to a monitor and plug in power cable
+7. After the RPI Zero 2 W boots and resizes the file system (this may take a few minutes) log in as a non-root user
+8. Copy over the zip or tar of the release to the device. Do not clone repositories on the disk if sending the device externally \
+   Hint: if using a flash drive you need to mount the drive.
+   ```
+   mkdir ~/usb
+   lsblk #find the USB's partition name, ex: /dev/sda1
+   sudo mount <partition name> ~/usb
+   cp ~/usb/rpi* ~
+   sudo umount -l ~/usb #Now safe to remove drive
+   sudo chown $USER -R ~/rpi_blower_tester* && sudo chgrp $USER -R ~/rpi_blower_tester*
+   unzip rpi_blower_tester* #then cd into directory
+   ```
+8. Install the program as shown below 
+
 ## Install
 ```sh
 sudo ./install.sh
+sudo reboot
 ```
 
 ## Uninstall
