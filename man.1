@@ -1,31 +1,33 @@
-.Dd 1/6/25               
+.Dd 3/9/25
 .Dt PROG_NAME
-.Sh NAME            
+.Sh NAME
 .Nm PROG_NAME
-.Sh SYNOPSIS             
+.Sh SYNOPSIS
 .Nm
 .Op Fl b
 .Op Fl h
 .Op Fl r
 .Op Fl t
 
-.Sh DESCRIPTION          
+.Sh DESCRIPTION
 .Nm
 is an application for programming and validating Blower/Thermocouple PCBAs (CG5-ELEC-E-019 V2.1+)
 using the Blower/Thermocouple tester (CG5-TEST-E-019) which is intended to run on the Raspberry Pi
-Zero 2W. Prinicipally this was designed as a production tool but can additionally serve for internal 
+Zero 2W. Prinicipally this was designed as a production tool but can additionally serve for internal
 Gastro. use as well. The application can be built and tested but not ran on Debian based Linux distributions.
 
 .Sh OPTIONS
 .Tp
--b, --build  Re-builds the docker container for the application
+-b, --build   Re-builds the docker container for the application
 .sp
--h, --help   Displays the manual page for the program
+-h, --help    Displays the manual page for the program
 .sp
--r, --run    Runs the application. Only supported on the Raspberry Pi Zero 2W 
-using the Blower/Thermocouple tester (CG5-TEST-E-019) 
+-r, --run     Runs the application. Only supported on the Raspberry Pi Zero 2W
+using the Blower/Thermocouple tester (CG5-TEST-E-019)
 .sp
--t, --test   Run the unit tests for the application
+-t, --test    Run the unit tests for the application
+.sp
+-v, --version Prints the version of the application
 .sp
 No arguments defaults to run
 

@@ -18,6 +18,4 @@ log_level = logging.DEBUG if args.verbose else logging.INFO
 logging.basicConfig(format="%(levelname)s:      %(message)s",
                     datefmt='%s', level=log_level)
 
-run("cls" if os.name == 'nt' else "clear", shell=True)
-
 blower_main()

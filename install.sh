@@ -56,7 +56,7 @@ function cp_udev_rule {
 function install_main {
   . .env
 
-  echo "Beginning installation of "$BLOWER_APP_NAME" -- Version: "$BLOWER_APP_VERSION")"
+  echo "Beginning installation of "$BLOWER_APP_NAME" -- Version: "$BLOWER_APP_VERSION""
 
   apt-get update
   apt-get install -y git ca-certificates curl

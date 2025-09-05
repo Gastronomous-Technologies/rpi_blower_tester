@@ -1,7 +1,7 @@
 SCRIPT_DIR=INSTALL_DIR
 
-unset DOCKER_HOST
-docker context use default
+unset DOCKER_HOST > /dev/null 2>&1
+docker context use default > /dev/null 2>&1
 
 GPIO_GID=$(getent group gpio | cut -d: -f3)
 DIALOUT_GID=$(getent group dialout | cut -d: -f3)
@@ -10,12 +10,17 @@ SPI_GID=$(getent group spi | cut -d: -f3)
 
 . $SCRIPT_DIR/src/*.env
 
+PROG_VERS=$BLOWER_APP_NAME" VERSION: "$BLOWER_APP_VERSION
+
 RUN_CMD="docker run --privileged \
          --group-add $GPIO_GID --group-add $DIALOUT_GID \
          --group-add $I2C_GID  --group-add $SPI_GID \
          -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
 
-if [ $# -eq 0 ]; then $RUN_CMD
+if [ $# -eq 0 ]; then
+  clear 
+  printf "$PROG_VERS\n\n"
+  $RUN_CMD
   
 else
   for cmd in "$@"
@@ -34,15 +39,19 @@ else
         ;;
 
       -r|--run)
-        echo "Running "$BLOWER_APP_NAME
+        clear
+        printf "$PROG_VERS\n\n"
         $RUN_CMD
       ;;
 
       -t|--test)
         echo "Testing "$BLOWER_APP_NAME
         docker run --rm $BLOWER_APP_NAME python -m pytest -o cache_dir=$WORKSPACE
-       ;;
+      ;;
 
+     -v|--version)
+        printf "Blower/Thermocouple Application Version: $BLOWER_APP_VERSION\n"
+      ;; 
      -*|--*)
         printf "Unknown command: "$1"\n"
         printf "Perhaps see man page or run "$BLOWER_APP_NAME "--help"
