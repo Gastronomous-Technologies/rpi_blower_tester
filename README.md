@@ -1,42 +1,43 @@
 ## Thermocouple/Blower Production Testing Testing Application
-### Supports CG5-CHAS-E-19 V2.1+
+### Supports CG6-CHAS-E-019 V1.5+
 
 ### Overview
 This is a software package built in bash and python to program and validate
-[CG5-ELEC-E-019 V2.1+](https://gastronomous.365.altium.com/designs/42E0F161-9A46-4870-873C-406A7E8BF709#design) boards with a [Blower Thermocouple Tester CG5-TEST-E-019](https://gastronomous.365.altium.com/designs/2D430438-1214-45B7-B8A9-F794314B5EE8?activeDocumentId=RPI_ZERO.SchDoc&variant=[No+Variations]&activeView=SCH&location=[1,96.74,17.35,27.39]#design). 
+[CG6-CHAS-E-019 V1.5+](https://gastronomous.365.altium.com/designs/DB1DAFDE-615B-4E2D-85D4-2C2DB54074B0#design) boards with a [Blower Thermocouple Tester CG6-TEST-E-019](https://gastronomous.365.altium.com/designs/1A2DD31A-9A23-4A60-B4DA-FE0705F6627D?activeView=SCH&activeDocumentId=RPI.SchDoc&variant=[No+Variations]&location=[1,96.72,14.2,22.42]#design). 
 
-The host machine is a Raspberry Pi Zero 2W. Programming of the device under test (DUT) is accomplished using a [STLINKV2](https://www.amazon.ca/CANADUINO-Compatible-Circuit-Programmer-Debugger/dp/B07B2K6ZPK/ref=asc_df_B07B2K6ZPK?mcid=d99c4133b6a134a289509d90224f34ed&tag=googleshopc0c-20&linkCode=df0&hvadid=706724917350&hvpos=&hvnetw=g&hvrand=15777128983881431215&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9192147&hvtargid=pla-836307266791&psc=1&gad_source=1)  programmer in conjunction with the opensource [STlink software](https://github.com/stlink-org/stlink?tab=readme-ov-file). 
+The host machine is a Raspberry Pi 5 B. Programming of the STM32's option bytes on the device under test (DUT) is accomplished using a [STLINKV2](https://www.amazon.ca/CANADUINO-Compatible-Circuit-Programmer-Debugger/dp/B07B2K6ZPK/ref=asc_df_B07B2K6ZPK?mcid=d99c4133b6a134a289509d90224f34ed&tag=googleshopc0c-20&linkCode=df0&hvadid=706724917350&hvpos=&hvnetw=g&hvrand=15777128983881431215&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9192147&hvtargid=pla-836307266791&psc=1&gad_source=1) programmer in conjunction with the opensource [STlink software](https://github.com/stlink-org/stlink?tab=readme-ov-file). Programming of the STM32 is completed over the USB connection using the 
+opensource [stm32flash](https://sourceforge.net/p/stm32flash/wiki/Home/) to test the reprogrammability of the PCBAs when installed in the end machine.
 
 ### Working Principle
-A systemd service starts a docker container that launches a python application. The python application will prompt the user to complete some operations and input y/n feedback and then the stlink will program the DUT to complete some tests, check the thermocouples, drive the fans, etc. 
+A systemd service starts a docker container that launches a python application on boot. Upon pressing the button the fixture will configure and program the device under test (DUT). Some automated tests will be performed to drive fans, measure thermocouples, etc. and the result will be displayed on the attached monitor. The test fixture loads test-firmware on the device which is later erased. The test firmware holds drives the red activity LED without blinking it as done in production firmware. After all tests are completed the STM32 microcontroller on the device under test will be erased. To trigger a safe shutdown of the host's operating system the operator should press and hold the push to test (PTT) button for a number of seconds.
 
 ### API Information
 After installation run
 ```sh
-rpi_blower_app --help
+rpi_blower_tester --help
 ```
 or 
 ```sh
-man rpi_blower_app
+man rpi_blower_tester
 ```
 
 ### OS Support
 Program Installation: 64 bit Raspberry Pi OS Lite (64-bit), Deb-Based Linux \
-Program Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA \
+Program Execution: RPI 5 B with CG6-TEST-E-019 PCBA \
 \
-Python App Installation and Unit Tests: Raspbian, Linux, Windows \
-Python App Execution: RPI Zero 2 W with CG5-TEST-E-019 PCBA 
+Python App Installation and Unit Tests: Raspbian, Linux \
+Python App Execution: RPI 5 B with CG6-TEST-E-019 PCBA 
 
 ## Deployment Instructions
 1. Download and install [rpi-imager](https://www.raspberrypi.com/software/)
 2. Use rpi-imager with a fresh SD card 16 GB or larger and format with Raspberry Pi OS Lite (64-bit) \
-   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/386b40bd-7f5b-4315-a732-86e005b8f8eb" />
+   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/778b28a5-e8dd-417d-ae4b-ab7e75072933" />
 3. Apply custom OS settings so that the card automatically connects to Wi-Fi \
-   <img width="250" height="500" alt="image" src="https://github.com/user-attachments/assets/446f8cb3-eb5c-4aa8-87de-d2846b9a80df" />
+   <img width="350" height="500" alt="image" src="https://github.com/user-attachments/assets/446f8cb3-eb5c-4aa8-87de-d2846b9a80df" />
 5. Write the image to the card \
-   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/a348bae7-b2cb-4fbd-b59b-b07764554d9f" />
-6. Plug card into RPI Zero 2 W on CG5-TEST-E-019 then connect HDMI to a monitor and plug in power cable
-7. After the RPI Zero 2 W boots and resizes the file system (this may take a few minutes) log in as a non-root user
+   <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/b94a9dbd-6a11-4de4-a960-2b3d34832387" />
+6. Plug card into RPI 5 B on CG6-TEST-E-019 then connect HDMI to a monitor and plug in power cable
+7. After the RPI 5 B boots and resizes the file system (this may take a few minutes) log in as a non-root user
 8. Copy over the zip or tar of the release to the device. Do not clone repositories on the disk if sending the device externally \
    Hint: if using a flash drive you need to mount the drive.
    ```

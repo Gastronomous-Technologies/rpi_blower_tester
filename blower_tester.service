@@ -1,5 +1,5 @@
 [Unit]
-Description=Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)
+Description=Blower/Thermocouple Testing Application (CG6-CHAS-E-019 V1.5+)
 Requires=docker.service
 After=docker.service
 
