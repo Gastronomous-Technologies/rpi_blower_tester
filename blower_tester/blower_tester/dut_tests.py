@@ -98,12 +98,10 @@ def configure_ftdi():
 
     return err, conf["ftdi"]["fail_desig"]
 
-def program_microcontroller():
+def _flash_firmware(bin_key):
     err = True
 
-    conf["log"].debug("Programming MCU...")
-
-    stm32_bin = "{}/lib/{:s}".format(Path(__file__).resolve().parent, conf["stm"]["bin_fd"])
+    stm32_bin = "{}/lib/{:s}".format(Path(__file__).resolve().parent, conf["stm"][bin_key])
     conf["log"].debug(f"stm32 binary: {stm32_bin}")
 
     ftdi_device_node = __get_ftdi_device_node()
@@ -121,6 +119,27 @@ def program_microcontroller():
 
     else:
         conf["log"].debug("Cannot find ftdi device node")
+
+    return err
+
+def program_microcontroller():
+    conf["log"].debug("Programming MCU...")
+    err = _flash_firmware("bin_fd")
+    return err, conf["stm"]["fail_desig"]
+
+def flash_production_firmware():
+    conf["log"].warning(f"{colour.yellow}Flashing PRODUCTION firmware - DO NOT remove the board, "
+                        f"please await completion...{colour.rst}")
+
+    dut_pwr_off()
+    dut_pwr_on()
+
+    err = _flash_firmware("prod_bin_fd")
+
+    if err is False:
+        conf["log"].info("Production firmware flashed, board is ready to remove")
+    else:
+        conf["log"].error("Production firmware flashing failed")
 
     return err, conf["stm"]["fail_desig"]
 
@@ -266,5 +285,6 @@ def get_test_seq():
         dut_test("Onboard temp",         check_onboard_temp     ),
         dut_test("Thermocouples",        check_thermocouples    ),
         dut_test("Fans",                 check_fans             ),
-        dut_test("Erasing MCU",          erase_mcu_flash        )
+        dut_test("Erasing MCU",          erase_mcu_flash        ),
+        dut_test("Flashing prod fw",     flash_production_firmware)
     ]

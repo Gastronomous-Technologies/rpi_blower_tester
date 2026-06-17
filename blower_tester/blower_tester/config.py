@@ -42,7 +42,8 @@ conf = {
     },
 
     "stm": {
-        "bin_fd"      : "test_fixture_thermal_monitor.bin",
+        "bin_fd"      : "test_fixture_thermal_monitor.bin", #test fixture firmware (used during tests)
+        "prod_bin_fd" : "thermal_monitor.bin",              #production switch-agnostic firmware (flashed after tests pass)
         "bin_addr"    : "0x8000000",  #string type
         "option_bytes": "0xDEFFE1AA", #string type
         "flash_baud"  :  "921600",
