@@ -10,7 +10,8 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
-FD_RULES=$(ls *stlinkv2*.rules)
+STLINK_RULES_FD=$(ls *stlinkv2*.rules)
+FTDI_RULES_FD=$(ls *ftdi*.rules)
 
 function inst_docker {
   #Docker Installation
@@ -47,9 +48,11 @@ function inst_serv {
 }
 
 function cp_udev_rule {
-  #STLINK Config
-  echo "Setting UDEV rules for STLINK V2"
-  cp $FD_RULES /etc/udev/rules.d/
+  #STLINK and FTDI config
+  echo "Setting UDEV rules for STLINK V2 and FTDI"
+  cp $STLINK_RULES_FD /etc/udev/rules.d/
+  cp $FTDI_RULES_FD /etc/udev/rules.d/
+
   adduser $USER dialout
 }
 
@@ -59,7 +62,7 @@ function install_main {
   echo "Beginning installation of "$BLOWER_APP_NAME" -- Version: "$BLOWER_APP_VERSION""
 
   apt-get update
-  apt-get install -y git ca-certificates curl
+  apt-get install -y git ca-certificates curl 
 
   inst_docker
   inst_serv
@@ -82,9 +85,10 @@ function install_main {
 
   printf "\033[0;32m\nInstallation complete\n\033[0m"
 
-  if cat /sys/firmware/devicetree/base/model || grep "Raspberry Pi Zero 2 W"; then
+  if cat /sys/firmware/devicetree/base/model || grep "Raspberry Pi 5 B"; then
     echo " detected, enabling on boot and setting up hardware peripherals"
 
+    apt-get -qq install liblgpio-dev -y #Allows RPI gpio to work on the host
     systemctl enable $BLOWER_SERVICE_FILE
 
     if ! grep -q "video=HDMI-A-1:" /boot/firmware/cmdline.txt; then
@@ -103,6 +107,14 @@ function install_main {
         printf "i2c-dev\n" >> /etc/modules
     fi
     modprobe i2c-dev
+
+    if ! grep -q "usb_max_current_enable" /boot/firmware/config.txt; then
+      sed -i '1s/^/usb_max_current_enable=1 /' /boot/firmware/config.txt
+    fi
+
+    if ! grep -q "PSU_MAX_CURRENT" /boot/firmware/config.txt; then
+      sed -i '1s/^/PSU_MAX_CURRENT=5000 /' /boot/firmware/config.txt
+    fi
 
     printf  "Please reboot Raspberry Pi for changes to take effect\n"
   fi

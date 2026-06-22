@@ -13,15 +13,24 @@ SPI_GID=$(getent group spi | cut -d: -f3)
 PROG_VERS=$BLOWER_APP_NAME" VERSION: "$BLOWER_APP_VERSION
 
 RUN_CMD="docker run --privileged \
+         --net=host \
          --group-add $GPIO_GID --group-add $DIALOUT_GID \
          --group-add $I2C_GID  --group-add $SPI_GID \
+         --cap-add=SYS_MODULE \
+         -v /run/udev:/run/udev \
+         -v /lib/modules:/lib/modules \
          -v /dev:/dev -v /sys:/sys -v /proc:/proc --rm -it $BLOWER_APP_NAME"
 
 if [ $# -eq 0 ]; then
   clear 
   printf "$PROG_VERS\n\n"
-  $RUN_CMD
-  
+  if $RUN_CMD; then
+    echo "Program exited cleanly, starting shutdown..."
+    shutdown -h now
+  else 
+    echo "Program exited with error code, not performing shutdown"
+  fi
+
 else
   for cmd in "$@"
 
@@ -34,8 +43,16 @@ else
         docker build -t $BLOWER_APP_NAME $SCRIPT_DIR/src/$BLOWER_PY_APP/
       ;;
 
+      -d|--deploy)
+        if $RUN_CMD; then
+          echo "Program exited cleanly, starting shutdown..."
+          shutdown -h now
+        else 
+          echo "Program exited with error code, not performing shutdown"
+        fi 
+      ;; 
       -h|--help)
-        man $SCRIPT_DIR/../man/man1/$BLOWER_EXEC_FILE.1
+        man $SCRIPT_DIR/share/man/man1/$BLOWER_EXEC_FILE.1
         ;;
 
       -r|--run)

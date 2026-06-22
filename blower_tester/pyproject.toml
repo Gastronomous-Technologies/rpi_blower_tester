@@ -4,13 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blower_tester"
-version = "08.2025"
+version = "05.2026"
 
 dependencies = [
-  "pytest",
-  "gpiozero",
-  "smbus2",
-  "spidev"
+    "pytest",
+    "gpiozero",
+    "smbus2",
+    "rpi.lgpio",
+    "pyudev",
+    "pyftdi",
+    "spidev"
 ]
 
 requires-python = ">=3.0"
@@ -23,7 +26,7 @@ maintainers = [
   {name = "Shaqeeb Momen", email = "shaqeeb.momen@gastronomous.ca"}
 ]
 
-description = "Blower/Thermocouple Testing Application (CG5-CHAS-E-019 V2.1+)"
+description = "Blower/Thermocouple Testing Application (CG6-CHAS-E-019 V1.5+)"
 
 [tool.hatch.build.targets.wheel]
 packages = ["blower_tester/"]
