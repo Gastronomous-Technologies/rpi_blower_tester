@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Build a deploy bundle from the LOCAL repo.
+#
+# Zips the current local working tree (so your edits here are what ship) into a
+# flat archive - files at the archive root, no wrapper folder - and writes the
+# bundle + extract.sh into ./release/. Cruft and packaging artifacts are left
+# out: .git, .github, .claude, __pycache__/*.pyc, .pytest_cache, *.zip, and the
+# bundle_release / extract.sh / release/ helpers themselves.
+#
+# Copy the resulting release/ contents to the target, then run ./extract.sh.
+#
+# Usage:
+#   ./bundle_release [output.zip]      (default: ./release/rpi_blower_tester.zip)
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NAME="rpi_blower_tester"
+RELEASE="$ROOT/release"
+
+OUT="${1:-$RELEASE/$NAME.zip}"
+mkdir -p "$(dirname "$OUT")"
+OUT="$(cd "$(dirname "$OUT")" && pwd)/$(basename "$OUT")"
+
+command -v zip >/dev/null 2>&1 || { echo "Error: 'zip' not installed (sudo apt install zip)" >&2; exit 1; }
+[ -f "$ROOT/extract.sh" ] || { echo "Error: extract.sh not found next to bundle_release" >&2; exit 1; }
+
+TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
+STAGE="$TMP/pkg"; mkdir -p "$STAGE"
+
+# Copy the local tree minus cruft/artifacts (tar pipe = modes/exec bits preserved).
+tar -C "$ROOT" \
+    --exclude='./.git' --exclude='./.github' --exclude='./.claude' \
+    --exclude='*/__pycache__' --exclude='*.pyc' --exclude='*/.pytest_cache' \
+    --exclude='*.zip' \
+    --exclude='./extract.sh' --exclude='./bundle_release' \
+    --exclude='./release' --exclude='./rpi_blower_tester_release' \
+    -cf - . | tar -C "$STAGE" -xf -
+
+mkdir -p "$RELEASE"
+rm -f "$OUT"
+# Files at the archive root (no wrapper folder) so extract.sh drops them
+# straight into the target directory.
+( cd "$STAGE" && zip -rq "$OUT" . )
+cp "$ROOT/extract.sh" "$RELEASE/extract.sh"
+chmod +x "$RELEASE/extract.sh"
+
+echo "Release ready: $RELEASE/"
+ls -l "$RELEASE" | sed 's/^/  /'
+echo "Bundle ($(du -h "$OUT" | cut -f1)) contents:"
+( cd "$STAGE" && find . -type f | sort | sed 's|^\./|  |' )
+echo ""
+echo "Deploy (extracts into whatever dir you run it from):"
+echo "  scp \"$RELEASE\"/* blower@<host>:~"
+echo "  ssh blower@<host> 'chmod +x extract.sh && ./extract.sh --install'"
