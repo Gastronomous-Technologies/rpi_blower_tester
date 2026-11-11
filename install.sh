@@ -85,8 +85,8 @@ function install_main {
 
   printf "\033[0;32m\nInstallation complete\n\033[0m"
 
-  if cat /sys/firmware/devicetree/base/model || grep "Raspberry Pi 5 B"; then
-    echo " detected, enabling on boot and setting up hardware peripherals"
+  if grep -qa "Raspberry Pi 5" /sys/firmware/devicetree/base/model 2>/dev/null; then
+    echo "$(tr -d '\0' < /sys/firmware/devicetree/base/model) detected, enabling on boot and setting up hardware peripherals"
 
     apt-get -qq install liblgpio-dev -y #Allows RPI gpio to work on the host
     systemctl enable $BLOWER_SERVICE_FILE
@@ -108,12 +108,20 @@ function install_main {
     fi
     modprobe i2c-dev
 
-    if ! grep -q "usb_max_current_enable" /boot/firmware/config.txt; then
-      sed -i '1s/^/usb_max_current_enable=1 /' /boot/firmware/config.txt
+    # Strip settings that older installs prepended onto line 1
+    sed -i -e '1s/^PSU_MAX_CURRENT=5000 //' -e '1s/^usb_max_current_enable=1 //' /boot/firmware/config.txt
+
+    if ! grep -q "^usb_max_current_enable=1" /boot/firmware/config.txt; then
+      printf "\n[all]\nusb_max_current_enable=1\n" >> /boot/firmware/config.txt
     fi
 
-    if ! grep -q "PSU_MAX_CURRENT" /boot/firmware/config.txt; then
-      sed -i '1s/^/PSU_MAX_CURRENT=5000 /' /boot/firmware/config.txt
+    # PSU_MAX_CURRENT is a bootloader EEPROM setting, not a config.txt one
+    if ! rpi-eeprom-config | grep -q "^PSU_MAX_CURRENT=5000"; then
+      EEPROM_CONF=$(mktemp)
+      rpi-eeprom-config | grep -v "^PSU_MAX_CURRENT=" > "$EEPROM_CONF"
+      printf "PSU_MAX_CURRENT=5000\n" >> "$EEPROM_CONF"
+      rpi-eeprom-config --apply "$EEPROM_CONF"
+      rm -f "$EEPROM_CONF"
     fi
 
     printf  "Please reboot Raspberry Pi for changes to take effect\n"
