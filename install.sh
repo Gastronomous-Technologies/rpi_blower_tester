@@ -75,7 +75,7 @@ function install_main {
   sed -i -e "s|INSTALL_DIR|${BLOWER_INSTALL_DIR::-1}|g" $BLOWER_INSTALL_DIR/bin/$BLOWER_EXEC_FILE
   cp -r $BLOWER_PY_APP $BLOWER_INSTALL_DIR/src/
 
-  cp man.1 $BLOWER_INSTALL_DIR/man/man1/$BLOWER_EXEC_FILE.1
+  cp man.1 $BLOWER_INSTALL_DIR/share/man/man1/$BLOWER_EXEC_FILE.1
   sed -i -e "s/PROG_NAME/"$BLOWER_EXEC_FILE"/g" $BLOWER_INSTALL_DIR/share/man/man1/$BLOWER_EXEC_FILE.1
   mandb
 
